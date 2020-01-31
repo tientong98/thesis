@@ -12,17 +12,14 @@ This Github repo consists of codes used in my thesis project: Testing difference
 
 Instruction here: https://github.com/DCAN-Labs/abcd-dicom2bids
 
-This repo has been cloned to `/Shared/tientong_scratch/abcd/code/00abcd2bids_convert/abcd2bids_github`
-
-To run their scripts, make sure you follow what is listed in the file below
+To run their scripts on our machines, make sure you follow what is listed in the file below
 `/Shared/tientong_scratch/abcd/code/00abcd2bids_convert/abcd2bids_github/notes_abcd2bids.txt`
 
-Also, because I only care about rs fMRI and sMRI, I went through all of the scripts and config files in the abcd-dicom2bids repo and delete everything related to task fMRI or validating BIDS (running BIDS validation needs docker, which can't be run on IFT machines). Below is an example of how to run this script
+Also, because I only care about rs fMRI and sMRI, I went through all of the scripts and config files in my local abcd-dicom2bids repo and delete everything related to task fMRI or validating BIDS (running BIDS validation needs docker, which can't be run on IFT machines). Below is an example of how to run this script
 
 `python <path to script>/abcd2bids.py /Shared/pinc/sharedopt/apps/fsl/Linux/x86_64/5.0.8 /Shared/tientong_scratch/abcd/code/00abcd2bids_convert/R2016b/v91 --username tientong --password <your password> 2>&1 | tee abcd2bids_log.txt `
 
 What I would recommend is submitting this as job on Argon
-
 
 ```bash
 # run this on argon
@@ -57,9 +54,9 @@ Download the `ABCD Fasttrack QC Instrument` file (https://nda.nih.gov/) with the
 
 then, copy the output to
 
-/Shared/tientong_scratch/abcd/code/00abcd2bids_convert/abcd2bids_github/spreadsheets/abcd_fastqc01.txt
+<local abcd2bids repo>/spreadsheets/abcd_fastqc01.txt
 
-## Multiple images of the same module of the same session
+## Multiple images of the same imaging module of the same session
 
 Have to pick the run that is better. How? running MRIQC
 
@@ -104,10 +101,9 @@ sub=(`echo $info | awk '{gsub("-"," "); print $2}'`)
 echo $sub
 done > ${outputFile}
 ```
-**Then run this on argon to create individual mriqc job script, then submit the jobs **
+**Then run this on argon to create individual subjects mriqc job script, then submit the jobs**
 
 ```bash
-
 for sub in $(cat /Shared/tientong_scratch/abcd/log/subjectlist/200129list.txt | tr '\n' ' ') ; do
 sed -e "s|SUBJECT|${sub}|" /Users/tientong/job_scripts/mriqc/abcd/mriqc_TEMPLATE.job > /Users/tientong/job_scripts/mriqc/abcd/mriqc_sub-${sub}.job
 done
@@ -152,7 +148,5 @@ Once the group level MRIQC is completed, move all files to
 `/Shared/tientong_scratch/abcd/derivatives/mriqc/200129list_group`
 
 # Choosing the best T1 or T2
-
-Both BrainsTools and Freesurfer can only have 1 T1/T2 input, therefore, have to choose the run with the best quality before running sMRI analysis. 
 
 Code: [`baw00ChooseBestStruct.R`](https://github.com/tientong98/thesis/blob/master/BRAINSTools%20Analysis/baw00ChooseBestStruct.R)
