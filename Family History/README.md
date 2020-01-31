@@ -19,11 +19,15 @@ Age in months at the time of the interview (interview_age)
 This value has been calculated from the de-identified birth date (middle of the birth month date) and the assent signature time stamp (annual visits) or mypi_date for mid-year visits, and is the same for all sessions of the baseline visit for each participant (even when these fall on different days).   
   
 FHP = at least 1 biological parent with AUD 
+
 FHN = no first- and second-degree relative with AUD
   
 Variables are in:
-ABCD Family History Assessment Part 1 fhxp101 (alc, drugs, depression)
-ABCD Family History Assessment Part 2 fhxp201 (mania, schizo, nervous, counselor, hospitalized, suicide)
+
+ABCD Family History Assessment Part 1 `fhxp101` (alc, drugs, depression)
+
+ABCD Family History Assessment Part 2 `fhxp201` (mania, schizo, nervous, counselor, hospitalized, suicide)
+
 Questions from:	Modification of the Family History Assessment from NCANDA	15 min	Brown et al. (2015)
 
 Codes from ABCD to categorize FH: https://github.com/ABCD-STUDY/family_history_problem_summary_scores/blob/master/FHx.alc.R
@@ -53,7 +57,7 @@ AUD diagnose (https://www.niaaa.nih.gov/alcohol-health/overview-alcohol-consumpt
 4) The Research Assistant did not administer the relevant questions because s/he thought s/he only needed to administer the relevant questions for those relatives whom the respondent believed might have been affected. That is, the respondent had knowledge of the biological relatives, had indicated that one or more relatives had the problem being assessed, but was told to just identify those relatives known to be affected.
 
 
-# Others
+# Notes
 
 **FH of AUD scoring**
 
