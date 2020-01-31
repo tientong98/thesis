@@ -1,19 +1,14 @@
 This folder contain codes for brain volumetric analysis with BRAINSTools - [BRAINSTools wiki](https://github.com/BRAINSia/BRAINSTools/wiki).
 
-The scipts are modified from the pipeline developed by the [Iowa Neuroimaging Core](https://github.com/TKoscik/nimg_core/blob/master/pipelines/structural_volumetrics/baw.md).
-
-All the steps involved were described in details in [this jupyter notebook](https://github.com/tientong98/thesis/blob/master/start_to_finish.ipynb).
+The scipts are modified from the pipeline developed by the researchers at the [Iowa Neuroimaging Core](https://github.com/TKoscik/nimg_core/blob/master/pipelines/structural_volumetrics/baw.md).
 
 # Running BrainsTools
 
-Follow the direction here https://github.com/TKoscik/nimg_core/blob/master/pipelines/structural_volumetrics/baw.md
-
 1. Run the csv creator
 
-`/Shared/tientong_scratch/abcd/abcd2bids_convert/abcd2bids_github/code/baw01BRAINSTools_csvcreator.sh`
+`baw01BRAINSTools_csvcreator.sh`
 
-Note: Looks like BrainsTools expects all session number to be different - have to replace session (baselineYear1Arm1) to a series of random numbers/strings 
-
+Note: BrainsTools expects all session to be different - have to replace session (baselineYear1Arm1) with a series of random numbers/strings 
 
 ```bash
 %%bash
@@ -26,18 +21,17 @@ done
 
 2. Make changes to the config file (on the lines written in the header
 
-`/Shared/tientong_scratch/abcd/code/baw02BRAINSTools.config`
+`baw02BRAINSTools.config`
 
 3. Run BrainsTools on argon with
 
-`/Shared/tientong_scratch/abcd/code/baw03runbaw.sh`
+`baw03runbaw.sh`
 
 The steps are pasted below:
 
 
-```python
+```bash
 # run this on argon
-%%bash
 
 sh /Shared/tientong_scratch/abcd/code/baw01BRAINSTools_csvcreator.sh -r /Shared/tientong_scratch -p abcd -o /Shared/tientong_scratch/abcd/derivatives/baw/200129.csv
 
