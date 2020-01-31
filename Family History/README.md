@@ -1,4 +1,4 @@
-This folder has codes for identifying subjects with (Family History Positive - FHP) and without (Family History Negative - FHN) a family history of Alcohol Use Disorder 
+This folder has codes for identifying subjects with (Family History Positive - FHP) and without (Family History Negative - FHN) a family history of Alcohol Use Disorder. 
 
 1. First, identify FHP and FHN `FamHisAlc.Rmd` 
 2. Then, exclude the identified subjects and drug exposure in utero `PhysicalHealth.Rmd`
@@ -12,9 +12,7 @@ This folder has codes for identifying subjects with (Family History Positive - F
 Details of the instruments are in Barch et al 2018, *Dev Cog Neuroscience*
 
 11,875 subjects
-
 Age in months at the time of the interview (interview_age)
-
 This value has been calculated from the de-identified birth date (middle of the birth month date) and the assent signature time stamp (annual visits) or mypi_date for mid-year visits, and is the same for all sessions of the baseline visit for each participant (even when these fall on different days).   
   
 FHP = at least 1 biological parent with AUD 
@@ -30,7 +28,8 @@ Codes from ABCD to categorize FH: https://github.com/ABCD-STUDY/family_history_p
 In ABCD we employed a version of the Family History Assessment Module Screener (FHAM-S) (Rice et al., 1995) that was used in the National Consortium on Alcohol and Neurodevelopment in Adolescence (NCANDA) study (http://www.ncanda.org/index.php). In the ABCD FHAM-S version, we have parents report on the presence/absence of symptoms associated with alcohol use disorder, substance use disorder, depression, mania, psychosis, and antisocial personality disorder in all 1st and 2nd degree “blood relatives” of the youth. (That is, biological relatives including full and half-siblings, parents, grandparents, and aunts and uncles.) 
 
 Question:
-Has ANY blood relative of your child ever had any problems due to alcohol, such as: 
+Has ANY blood relative of your child ever had any problems due to alcohol, such as:
+
 0. No problem  
 1. Marital  separation or divorce;   
 2. Laid off or fired from work;   
