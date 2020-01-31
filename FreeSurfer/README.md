@@ -4,13 +4,11 @@ For both steps (ANTS Atropos N4 correction and freesurfer recon-all):
 * First, create a template .sh script, with placeholders for subject id and session number
 * Then, run the `create.sh` scripts to create individual subject script using `sed` to replace placeholders with actual IDs
 * Lastly, run scripts in parallel with `xargs`
+* QC Freesurfer outputs with `stats2table_bash_qoala_t.sh`
 
 # Running Freesurfer
 
 ## First Create Atropos N4  T1 and T2
-
-Template file is `/Shared/tientong_scratch/abcd/code/freesurfer00AtroposN4TEMPLATE.sh.in`, need to run a script to generate individuals' Atropos N4 correction script
-
 
 ```bash
 cd /Shared/tientong_scratch/abcd/code/freesurfer00AtroposN4_T1 # all the sh scripts will be here
