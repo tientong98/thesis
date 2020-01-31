@@ -1,0 +1,211 @@
+---
+title: "Physical Health"
+output: html_notebook
+---
+
+# TBI
+
+DATA -- ABCD Sum Scores Traumatic Brain Injury in `abcd_tbi01` 
+  
+Traumatic brain injury of youth summary scores (baseline) -- sums score from ABCD Parent Ohio State Traumatic Brain Injury Screen-Short Modified `abcd_otbi01`  
+  
+Variable of interest: `tbi_ss_worst_overall`  
+Worst Injury Overall: Worst TBI -   
+1, Improbable TBI (no TBI or TBI w/o LOC or memory loss);   
+2, Possible mild TBI (TBI w/o LOC but memory loss);   
+3, Mild TBI (TBI w/LOC ≤ 30 min);   
+4, Moderate TBI (TBI w/LOC 30 min - 24 hrs);   
+5, Severe TBI (TBI w/ LOC ≥ 24 hrs)  
+
+citation: Bogner, J. A., Whiteneck, G. G., et al. (2017) Test-Retest Reliability of Traumatic Brain Injury Outcome Measures: A Traumatic Brain Injury Model Systems Study. J Head Trauma Rehabil 32(5): E1-E16.  
+
+```{r}
+rm(list=ls())
+```
+
+
+```{r}
+data.dir <- ("~/Documents/abcd/physicalhealth/")
+setwd(data.dir)
+library(dplyr)
+
+# read TBI
+tbi = read.csv2("~/Documents/abcd/release2.0.1/abcd_tbi01.txt", sep = "\t", 
+                header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+# only include those without TBI and data from first assessment
+notbi <- tbi[-c(1),] %>%
+  filter(eventname == "baseline_year_1_arm_1", tbi_ss_worst_overall == 1) %>%
+  arrange(subjectkey)
+# then refresh row index
+rownames(notbi) <- NULL
+
+saveRDS(notbi, file = "notbi.rds")
+notbi <- readRDS(file = "~/Documents/abcd/physicalhealth/notbi.rds")
+```
+
+# Family History Positive:  
+   
+Either Parent >= 2 symptoms: FHP 1108 
+546F & 562M
+     
+Excluding TBI Either Parent >= 2 symptoms: FHP 1043   
+518F & 525M
+ 
+
+```{r}
+fhp_thresh2 <- readRDS(file = "~/Documents/abcd/mentalhealth/fhp_thresh2.rds")
+
+fhp2.notbi <- subset(fhp_thresh2, subjectkey %in% notbi$subjectkey)
+fhp2.notbi <- select(fhp2.notbi, subjectkey, sex, interview_age)
+  
+saveRDS(fhp2.notbi, file = "~/Documents/abcd/mentalhealth/fhp_thresh2notbi.rds")
+length(fhp2.notbi$subjectkey)
+table(fhp2.notbi$sex)
+```
+
+Family History Negative: 6752         
+3255F  &  3496M (1 unspecified)  
+    
+Excluding TBI: 6530    
+3158  &  3371 (1 unspecified)  
+
+```{r}
+fhn <- readRDS(file = "~/Documents/abcd/mentalhealth/fhn.rds")
+
+fhn.notbi <- subset(fhn, subjectkey %in% notbi$subjectkey)
+fhn.notbi <- fhn.notbi %>% select(1:3)
+  
+saveRDS(fhn.notbi, file = "~/Documents/abcd/mentalhealth/fhnnotbi.rds")
+length(fhn.notbi$subjectkey)
+table(fhn.notbi$sex)
+```
+
+
+# Developmental History Questionnaire	(maternal substance use during pregnancy)
+
+**Later can check with Fetal Alcohol Syndrome with IQ, head size, height and weight**
+
+Raw data: ABCD Developmental History Questionnaire `dhx01` Kessler et al., 2009a, Kessler et al., 2009b, Merikangas et al., (2009)  
+
+From Barch et al 2018  
+
+Events and experiences that occurred either when the youth was in utero or throughout the course of their early development may either be indicators of early risk outcomes (delay in developmental milestones), or predictors of later outcomes (e.g., maternal substance use during pregnancy, birth trauma, etc.). Thus, the parent assessment battery includes a developmental history questionnaire that was originally developed by the Adolescent Component of the National Comorbidity Survey (Kessler et al., 2009a, Kessler et al., 2009b, Merikangas et al., 2009) with some additional supplemental questions on maternal use of substances during pregnancy (see Table 3). This questionnaire covers maternal prenatal care, maternal substance use during pregnancy (including caffeine and tobacco), prenatal maternal health conditions (e.g., gestational diabetes), prematurity, birth complications, and developmental milestones. This assessment is completed at the baseline initial assessment only.  
+
+Summary data: ABCD Summary Scores Developmental History `abcd_devhxss01` -- summary
+
+_ 8 _ variables: before knowing of pregnancy  
+_ 9 _ variables: knowing of pregnancy  
+1 = Yes /Sí;   exclude those
+0 = No /No;   
+999 = Don't know/ No lo sé    include those
+devhx_ss_12_p = months premature birth
+
+Tobacco?  How many times per day?  
+Alcohol?  Maximum drinks in one sitting?  
+Alcohol?  Average drinks per week?  
+Alcohol?  How many drinks did it take to feel the effects of alcohol?  
+Marijuana?   How many times per day?  
+Cocaine/Crack? How many times per day?  
+Heroin/Morphine?  How many times per day?  
+Oxycontin?     How many times per day?  
+
+
+Hill distinguish between FHAUD and alcohol exposure
+
+```{r}
+# read pregnancy drug exposure
+preg = read.csv2("~/Documents/abcd/release2.0.1/abcd_devhxss01.txt", sep = "\t", 
+                 header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+# delete unneeded var, then EXCLUDE people who DIDNOT report NOT using cocain, heroin, oxycotin
+
+preg <- preg[-c(1),] %>%
+  filter(eventname == "baseline_year_1_arm_1") %>%
+  arrange(subjectkey) %>%
+  select(-devhx_ss_8_alcohol_max_p, -devhx_ss_8_alcohol_effects_p, 
+         -devhx_ss_9_alcohol_max_p, -devhx_ss_9_alcohol_effects_p) %>%
+  filter(devhx_ss_8_coc_crack_amt_p == 0, devhx_ss_8_her_morph_amt_p == 0,
+           devhx_ss_8_oxycont_amt_p == 0, devhx_ss_9_coc_crack_amt_p == 0,
+           devhx_ss_9_her_morph_amt_p == 0, devhx_ss_9_oxycont_amt_p == 0)
+
+# then refresh row index
+rownames(preg) <- NULL
+preg[,10:22] <- sapply(preg[,10:22], as.numeric)
+
+paste("devhx_ss_8_cigs_per_day_p")
+table(preg$devhx_ss_8_cigs_per_day_p)
+out1 <- mean(preg$devhx_ss_8_cigs_per_day_p, na.rm=T) + 2 * sd(preg$devhx_ss_8_cigs_per_day_p, na.rm=T)
+paste("devhx_ss_8_alcohol_avg_p")
+table(preg$devhx_ss_8_alcohol_avg_p)
+out2 <- mean(preg$devhx_ss_8_alcohol_avg_p, na.rm=T) + 2 * sd(preg$devhx_ss_8_alcohol_avg_p, na.rm=T)
+paste("devhx_ss_8_marijuana_amt_p")
+table(preg$devhx_ss_8_marijuana_amt_p)
+out3 <- mean(preg$devhx_ss_8_marijuana_amt_p, na.rm=T) + 2 * sd(preg$devhx_ss_8_marijuana_amt_p, na.rm=T)
+paste("devhx_ss_9_cigs_per_day_p")
+table(preg$devhx_ss_9_cigs_per_day_p)
+out4 <- mean(preg$devhx_ss_9_cigs_per_day_p, na.rm=T) + 2 * sd(preg$devhx_ss_9_cigs_per_day_p, na.rm=T)
+paste("devhx_ss_9_alcohol_avg_p")
+table(preg$devhx_ss_9_alcohol_avg_p)
+out5 <- mean(preg$devhx_ss_9_alcohol_avg_p, na.rm=T) + 2 * sd(preg$devhx_ss_9_alcohol_avg_p, na.rm=T)
+paste("devhx_ss_9_marijuana_amt_p")
+table(preg$devhx_ss_9_marijuana_amt_p)
+out6 <- mean(preg$devhx_ss_9_marijuana_amt_p, na.rm=T) + 2 * sd(preg$devhx_ss_9_marijuana_amt_p, na.rm=T)
+
+preg <- preg %>%
+  filter(preg$devhx_ss_8_cigs_per_day_p < out1,
+         preg$devhx_ss_8_alcohol_avg_p < out2,
+         preg$devhx_ss_8_marijuana_amt_p < out3,
+         preg$devhx_ss_9_cigs_per_day_p < out4,
+         preg$devhx_ss_9_alcohol_avg_p < out5,
+         preg$devhx_ss_9_marijuana_amt_p < out6)
+
+saveRDS(preg, file = "preg.rds")
+preg <- readRDS(file = "~/Documents/abcd/physicalhealth/preg.rds")
+```
+ 
+ 
+Family History Positive:  
+
+Either Parent >= 2 symptoms: FHP 1108 
+546F & 562M
+     
+Excluding TBI: FHP 1043   
+518F & 525M
+
+Excluding extreme drug exposure: FHP 605   
+308F & 297M
+
+```{r}
+fhp2.notbi <- readRDS(file = "~/Documents/abcd/mentalhealth/fhp_thresh2notbi.rds")
+
+fhp2.notbi.preg <- subset(fhp2.notbi, subjectkey %in% preg$subjectkey)
+  
+saveRDS(fhp2.notbi.preg, file = "~/Documents/abcd/mentalhealth/fhp_thresh2notbipreg.rds")
+length(fhp2.notbi.preg$subjectkey)
+table(fhp2.notbi.preg$sex)
+```
+
+Family History Negative: 6752         
+3255F  &  3496M (1 unspecified)  
+    
+Excluding TBI: 6530    
+3158  &  3371 (1 unspecified)  
+
+Excluding drug exposure: 5538  
+2679F  &  2858M (1 unspecified)
+
+```{r}
+fhn.notbi.preg <- subset(fhn.notbi, subjectkey %in% preg$subjectkey)
+  
+saveRDS(fhn.notbi.preg, file = "~/Documents/abcd/mentalhealth/fhnnotbipreg.rds")
+length(fhn.notbi.preg$subjectkey)
+table(fhn.notbi.preg$sex)
+```
+
+# other scales measuring physical health
+
+Those were already analyzed in demographs
+
+ABCD Sum Scores Physical Health Parent `abcd_ssphp01` -- different sleep disorders and puberty  
+ABCD Sum Scores Physical Health Youth `abcd_ssphy01` -- puberty  

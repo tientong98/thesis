@@ -1,0 +1,226 @@
+---
+title: "Family History of Alcoholism"
+output: html_notebook
+---
+
+# Family History
+
+Details of the instruments are in Barch et al 2018, *Dev Cog Neuroscience*
+
+11,875 subjects \
+Age in months at the time of the interview (interview_age)
+This value has been calculated from the de-identified birth date (middle of the birth month date) and the assent signature time stamp (annual visits) or mypi_date for mid-year visits, and is the same for all sessions of the baseline visit for each participant (even when these fall on different days).   
+  
+FHP = at least 1 biological parent with AUD \
+FHN = no first- and second-degree relative with AUD\
+  
+Variables are in:\
+ABCD Family History Assessment Part 1 fhxp101 (alc, drugs, depression)\
+ABCD Family History Assessment Part 2 fhxp201 (mania, schizo, nervous, counselor, hospitalized, suicide)\
+Questions from:	Modification of the Family History Assessment from NCANDA	15 min	Brown et al. (2015)
+
+Codes from ABCD to categorize FH: https://github.com/ABCD-STUDY/family_history_problem_summary_scores/blob/master/FHx.alc.R
+
+In ABCD we employed a version of the Family History Assessment Module Screener (FHAM-S) (Rice et al., 1995) that was used in the National Consortium on Alcohol and Neurodevelopment in Adolescence (NCANDA) study (http://www.ncanda.org/index.php). In the ABCD FHAM-S version, we have parents report on the presence/absence of symptoms associated with alcohol use disorder, substance use disorder, depression, mania, psychosis, and antisocial personality disorder in all 1st and 2nd degree “blood relatives” of the youth. (That is, biological relatives including full and half-siblings, parents, grandparents, and aunts and uncles.) 
+
+Question:
+Has ANY blood relative of your child ever had any problems due to alcohol, such as: \
+0. No problem  \
+1. Marital  separation or divorce;   \
+2. Laid off or fired from work;   \
+3. Arrests or DUIs;   \
+4. Alcohol harmed their health; \
+5. In an alcohol treatment program; \
+6. Suspended or expelled from school 2 or more times; \
+7. Isolated self from family, caused arguments or were drunk a lot.  \
+
+AUD diagnose (https://www.niaaa.nih.gov/alcohol-health/overview-alcohol-consumption/alcohol-use-disorders)  
+
+## FH Known issues release 2.0.1:
+
+“Missing” or blank responses could mean:\
+1) Nothing is known about any biological relative (famhx_1=0) so questions are not asked.\
+2) The problem can be assumed to be negative or a “0” (zero) because the respondent indicated that no biological relative had that particular type of problem.\
+3) The relative does not exist (e.g., only has 1 paternal uncle so paternal uncle 2 is blank); questions are only asked if the relative exists. The number and type of biological relatives can be found in variables famhx_1a_p – to-- fhx_3h_older_p.\
+4) The Research Assistant did not administer the relevant questions because s/he thought s/he only needed to administer the relevant questions for those relatives whom the respondent believed might have been affected. That is, the respondent had knowledge of the biological relatives, had indicated that one or more relatives had the problem being assessed, but was told to just identify those relatives known to be affected.
+
+# Load the data
+
+```{r}
+rm(list=ls())
+data.dir <- ("~/Documents/abcd/mentalhealth/")
+setwd(data.dir)
+library("dplyr")
+library("psych")
+library("stringr")
+
+# read family history file
+fh = read.csv2("~/Documents/abcd/release2.0.1/fhxp102.txt", sep = "\t", header = TRUE,
+               stringsAsFactors = F)
+# delete the first row, which is the description of each column
+# filter to include baseline data only
+
+# EXCLUDE people who can't provide information on the biological relatives:
+# famhx_1: Parent/Reporter has knowledge about child's biological relatives? == 0 
+# at this step, elimiate 135 people (11875 -> 11740)
+
+# EXCLUDE people who said "don't know"
+# famhx_4_p: Has ANY blood relative of your child ever had any problems due to alcohol, such as: Marital  separation or divorce; Laid off or fired from work; Arrests or DUIs; Alcohol harmed their health; In an alcohol treatment program; Suspended or expelled from school 2 or more times; Isolated self from family, caused arguments or were drunk a lot == 999
+# at this step, elimiate 188 people (11740 -> 11552)
+
+fh <- fh[-c(1),] %>%
+  filter(eventname == "baseline_year_1_arm_1", famhx_1 == 1, famhx_4_p != 999) %>%
+  arrange(subjectkey)
+# then refresh row index
+rownames(fh) <- NULL
+
+saveRDS(fh, file = "fh.rds")
+fh <- readRDS(file = "~/Documents/abcd/mentalhealth/fh.rds")
+
+```
+
+# Family History Positive: More conservative criteria
+
+#######################################################
+#################### DO NOT USE THIS###################
+#######################################################
+
+```{r}
+# FHP = at least 1 biological parent with AUD = answered yes to "treatment"
+#######################################################
+#################### DO NOT USE THIS###################
+#######################################################
+
+fhp <- fh %>%
+  select(subjectkey, interview_age, sex, famhx_4d_p___4, famhx4a_p___4) %>%
+  arrange(subjectkey) %>%
+  filter(famhx_4d_p___4 == 1 | famhx4a_p___4 == 1)
+fhp$interview_age <- as.numeric(as.character(fhp$interview_age))
+
+saveRDS(fhp, file = "fhp.rds")
+fhp <- readRDS(file = "fhp.rds")
+saveRDS(fhp$subjectkey, file = "fhpvec.rds")
+fhpvec <- readRDS(file = "fhpvec.rds")
+
+cat(paste('FHP:', length(fhp$subjectkey)))
+describe(fhp$interview_age)
+table(fhp$sex)
+
+```
+
+  
+# Family History Positive: More liberal criteria Threshold >= 2
+
+```{r}
+# FHP = at least 1 biological parent with AUD = answered yes to at least one of the problem
+fh <- readRDS(file = "~/Documents/abcd/mentalhealth/fh.rds")
+
+# famhx_4d_p = biological mother
+mother <- fh[stringr::str_subset(names(fh[1:469]), "famhx_4d_p")]
+mother$subjectkey <- fh$subjectkey
+
+# famhx4a_p = biological father
+father <- fh[stringr::str_subset(names(fh[1:469]), "famhx4a_p")]
+father$subjectkey <- fh$subjectkey
+
+fhp <- merge(mother, father, all = T)
+
+fhp <- fhp[, -grep("___999", colnames(fhp))]
+fhp <- fhp[, -grep("___0", colnames(fhp))]
+fhp[fhp[,] == ""] <- 0
+
+fhp$interview_age <- fh$interview_age
+fhp$sex <- fh$sex
+fhp$eventname <- fh$eventname
+fhp <- fhp %>% 
+  select(subjectkey, interview_age, sex, eventname, everything())
+fhp[, c(2,5:18)] <- sapply(fhp[, c(2,5:18)], as.numeric)
+fhp$mother <- rowSums(fhp[, c(5:11)])
+fhp$father <- rowSums(fhp[, c(12:18)])
+fhp_thresh2 <- fhp %>% filter(mother >= 2 | father >= 2)
+
+saveRDS(fhp_thresh2, file = "fhp_thresh2.rds")
+write.table(fhp_thresh2, file = "fhp_thresh2.tsv", row.names = F, sep = "\t")
+fhp_thresh2 <- readRDS(file = "~/Documents/abcd/mentalhealth/fhp_thresh2.rds")
+
+cat(paste('FHP:', length(fhp_thresh2$subjectkey)))
+psych::describe(fhp_thresh2$interview_age)
+table(fhp_thresh2$sex)
+
+```
+Either Parent >= 2 symptoms: FHP 1108 (546F, 562M)
+  
+# Family History Negative
+
+
+```{r}
+# FHN = no 1st and 2nd degree relative had AUD (answered yes to any of the 7 symptoms)
+#  select subjectkey, interview_age, sex, then all acl symptoms
+fhn <- fh %>% select(4,7,8,38:469) %>% arrange(subjectkey)
+fhn <- fhn[, -grep("___999", colnames(fhn))]
+fhn <- fhn[, -grep("___0", colnames(fhn))]
+fhn[fhn[,] == ""] <- 0
+fhn[, c(2,4:339)] <- sapply(fhn[, c(2,4:339)], as.numeric)
+fhn$allrel <- rowSums(fhn[, c(4:339)])
+fhn <- fhn %>% filter(allrel == 0)
+
+saveRDS(fhn, file = "fhn.rds")
+write.table(fhn, file = "fhn.tsv", row.names = F, sep = "\t")
+fhn <- readRDS(file = "~/Documents/abcd/mentalhealth/fhn.rds")
+
+cat(paste('fhn:', length(fhn$subjectkey)))
+describe(fhn$interview_age)
+table(fhn$sex)
+```
+
+# Then, need to exclude youths with TBI history, pregnancy drug exposure, youth substance use, psych disorders
+
+exclude youths with TBI history, pregnancy drug exposure -- In `PhysicalHealth.Rmd`
+
+exclude youths with substance use -- In `substance.Rmd`
+
+exclude youths with psychological disorders (schizo, bipolar, ASD) - in `MentalHealth.Rmd`
+
+### Family History Negative:  
+Family History Negative: 6752         
+3255F  &  3496M (1 unspecified)  
+    
+Excluding TBI: 6530    
+3158  &  3371 (1 unspecified)  
+
+Excluding drug exposure: 5538  
+2679F  &  2858M (1 unspecified)
+
+Excluding substance use: 5504  
+2665 & 2838 (1 unspecified)
+
+Excluding psych: 5024
+2449 & 2575 
+
+fhn.notbi.noexpose.nodrug.nopsy <- readRDS(file = "~/Documents/abcd/mentalhealth/fhnnotbipregnodrugnopsy.rds")
+  
+  
+### Family History Positive:  
+Either Parent >= 2 symptoms: FHP 1108 
+546F & 562M
+     
+Excluding TBI Either Parent >= 2 symptoms: FHP 1043   
+518F & 525M
+
+Excluding extreme drug exposure: FHP 605   
+308F & 297M
+
+Excluding drug use: 597
+307F & 290M
+
+Excluding psych (psychosis, bipolar, sud): 524
+274F & 250M 
+
+fhp2.notbi.preg.nodrug.nopsy <- readRDS(file = "~/Documents/abcd/mentalhealth/fhp_thresh2notbipregnodrugnopsy.rds")
+
+```{r}
+fhp <- readRDS(file = "~/Documents/abcd/mentalhealth/fhp_thresh2notbipregnodrugnopsy.rds")
+write.table(fhp, file = "fhp524.tsv", row.names = F, sep = "\t")
+```
+
+

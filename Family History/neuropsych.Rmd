@@ -1,0 +1,408 @@
+---
+title: "Neuropsychological Measures"
+output: html_notebook
+---
+
+talk title: neurocogntive fucntions in children with a family history of alcohol use disorder
+
+Details here: Luciana, M., Bjork, J. M., Nagel, B. J., Barch, D. M., Gonzalez, R., Nixon, S. J., & Banich, M. T. (2018). Adolescent neurocognitive development and impacts of substance use: Overview of the adolescent brain cognitive development (ABCD) baseline neurocognition battery. Developmental cognitive neuroscience, 32, 67-79.
+
+# ABCD Youth Snellen Vision Screener (SVS)
+
+`abcd_svs01`
+
+The battery begins with an assessment of visual acuity, in which both eyes are tested together (Snellen Chart: Snellen, 1862). Legal blindness is an exclusion for participation in ABCD given the highly visual nature of the subsequent neurocognitive assessment. While it could be argued that near-vision is most relevant to the subsequent task demands, an acceptable measure that could be readily standardized across sites could not be identified. Moreover, visual acuity problems detected by the Snellen Chart could indicate deviations in neural or- ganization that would be important to ascertain.
+
+ABCD Youth Snellen Vision Screener (SVS) - Vision screening; **the score is the last line correctly read on the Snellen chart without errors, with both eyes together, and using corrective lenses if needed**; from Snellen, H. (1862). Letterproeven tot Bepaling der Gezictsscherpte, Utrecht, Weyers (Dutch edition). Also published in many languages as Optotypi ad Visum Determinandum.
+
+
+snellen_aid_y		Do you wear any necessary corrective aids (glasses, contacts)? 1 = Yes; 0 = No; Starting from the top of the chart, please read aloud one row at a time from left to right until I tell you to stop. If needed, say Keep going.
+  
+snellen_aidpres_y	snellen_aid_y == 1	Are you wearing them now? Ensure subject is wearing them)	1 = Yes; 0 = No; Starting from the top of the chart, please read aloud one row at a time from left to right until I tell you to stop. If needed, say Keep going.
+  
+snellen_va_y		1. Ensure that the chart is located in a well lit area and readily readable. 2. Verify if the child has corrective lenses and if so, whether he or she is wearing them. 3. Ascertain whether h/she can appropriately respond to stimuli on an iPad screen. Smallest line subject was able to see without error? Line numbers are represented on the right-most side of the chart.	0 ; 1 ; 2 ; 3 ; 4 ; 5 ; 6 ; 7 ; 8 ; 9 ; 10 ; 11	0 = Can't read line 1; 1 = Line 1; 2 = Line 2; 3 = Line 3; 4 = Line 4; 5 = Line 5; 6 = Line 6; 7 = Line 7; 8 = Line 8; 9 = Line 9; 10 = Line 10; 11 = Line 11 // Users should consider variations in visual status (Snellen) before analyzing the neurocognition data. Many children have scores indicating poor vision.
+  
+vis_flg	snellen_va_y == 4 || snellen_va_y == 3 || snellen_va_y == 2	Can the participant read the stimuli on the iPad?	1 = YES = proceed with testing; 2 = NO = stop testing	
+
+EXCLUDE vis_flg == 2 AND snellen_va_y == 0, 1
+
+```{r}
+rm(list=ls())
+```
+
+
+```{r}
+data.dir <- ("~/Documents/abcd/neuropsych/")
+setwd(data.dir)
+library(dplyr)
+
+# read information
+visual = read.csv2("~/Documents/abcd/release2.0.1/abcd_svs01.txt", sep = "\t", header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+visual <- visual[-c(1),]
+# then refresh row index
+rownames(visual) <- NULL
+
+normvis <- visual %>%
+  filter(vis_flg != 2 & snellen_va_y != 0 & snellen_va_y != 1)
+
+table(visual$snellen_va_y)
+table(visual$vis_flg)
+table(normvis$snellen_va_y)
+table(normvis$vis_flg)
+
+saveRDS(visual, file = "visual.rds")
+visual <- readRDS(file = "~/Documents/abcd/neuropsych/visual.rds")
+saveRDS(normvis, file = "~/Documents/abcd/neuropsych/normvis.rds")
+```
+
+Initial N = 11875  
+After excluding abnormal vision N = 11844  
+    
+**Use `snellen_va_y` as covariate when analyzing neuropsych?**
+
+# ABCD Youth Edinburgh Handedness Inventory Short Form `abcd_ehis01`
+
+ABCD Youth Edinburgh Handedness Inventory Short Form (EHIS) - Handedness; laterality quotient; participants complete four self-report items to yield an estimate of handedness (right, mixed, left); details can be found in Veale, J.F. (2014). Edinburgh Handedness Inventory - Short Form: A revised version based on confirmatory factor analysis. Laterality, 19(2), 164-177.
+
+```{r}
+handedness <- readRDS(file = "~/Documents/abcd/demographics/handedness.rds")
+```
+
+
+# 4.1. NIH Toolbox®–Cognition battery
+The NIH Toolbox® cognition measures (herein referred to as “the Toolbox”) were developed as part of the NIH Blueprint for Neuroscience Research (see http://www.nihtoolbox.org for the history of their development) and consist of **seven different tasks that cover episodic memory, executive function, attention, working memory, processing speed, and language abilities and are used to generate three composite scores (Bleck et al., 2013, Gershon et al., 2013b, Hodes et al., 2013)**.   
+
+Normative data were generated with a nationally representative sample of close to 5000 participants. As such, the Toolbox offered many attributes desirable to ABCD and allows harmonization and comparisons of cognitive performance with numerous other studies. The tasks were selected based on a consensus building process, and developed and validated using assessment methodologies that included **item response theory (IRT)** and **computerized adaptive testing (CAT)** where appropriate and feasible. The original Toolbox® used a desktop web-based computer interface, but subsequently moved on to **iPad based administration, which is what is being used in the ABCD study**. The tasks do require some tester interaction, with the results input through a standard interface into the same database. The iPad version is available through iTunes, but requires documentation of expertise before activation to ensure that the general public does not download and practice performance on the tasks in a way that might eventually bias results. The total time for administration of the NIH Toolbox® Cognitive battery is approximately 35 minutes. 
+   
+Although there are both English (Casaletto et al., 2015) and Spanish (Casaletto et al., 2016, Flores et al., 2017) language versions of the Toolbox® available, **the ABCD study administers only the English version to youth, as proficiency in English for the youth (but not the parent) is a requisite for study participation**.
+
+ABCD Youth NIH TB Summary Scores` abcd_tbss01`
+
+Uncorrected Scores: Uncorrected scores compare the score of the test taker to those in the nationally representative NIH Toolbox normative sample (ages 3 to 85 years) regardless of age or any other variable. These are presented as Standard Scores (mean=100, SD=15).
+  
+Age Corrected Scores: Age-corrected scores compare the score of the test-taker to others of the same age. Age-corrected scores were derived separately for children (ages 3-17) and adults (ages 18-85). For children, normative scores are provided separately for each year of age to take into account expected developmental changes. These are presented as Standard Scores (mean=100, SD=15).
+  
+Fully Corrected T-Score: Fully Corrected T-Scores (mean = 50, SD = 10) compare the score of the test-taker to those in the NIH Toolbox nationally representative normative sample, while adjusting for key demographic variables. These variables include age, gender, race/ethnicity (white/Asian, black, Hispanic, multiracial), and educational attainment (for ages 3-17, parent’s education is used; education is often used as a proxy for socioeconomic status). Thus a “fully corrected” score allows for comparison within a narrower grouping.
+
+```{r}
+# read information
+nihtb = read.csv2("~/Documents/abcd/release2.0.1/abcd_tbss01.txt", sep = "\t", header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+nihtb <- nihtb[-c(1),]
+# then refresh row index
+rownames(nihtb) <- NULL
+
+nihtb <- nihtb %>%
+  filter(eventname == "baseline_year_1_arm_1") %>%
+  arrange(subjectkey)
+
+nihtb_uc <- nihtb[, grep("_uncorrected", colnames(nihtb))]
+nihtb_c <- nihtb[, grep("_agecorrected", colnames(nihtb))]
+nihtb_fc <- nihtb[, grep("_fc", colnames(nihtb))]
+subjectkey <- nihtb$subjectkey
+nihtb_uc <- data.frame(subjectkey, nihtb_uc)
+nihtb_c <- data.frame(subjectkey, nihtb_c)
+nihtb_fc <- data.frame(subjectkey, nihtb_fc)
+
+nihtb <- Reduce(function(...) merge(..., all=T), 
+                    list(nihtb_uc, nihtb_c, nihtb_fc))
+
+nihtb_uc[,2:11] <- sapply(nihtb_uc[,2:11], as.numeric)
+nihtb_c[,2:11] <- sapply(nihtb_c[,2:11], as.numeric)
+nihtb_fc[,2:11] <- sapply(nihtb_fc[,2:11], as.numeric)
+nihtb[,2:31] <- sapply(nihtb[,2:31], as.numeric)
+
+
+saveRDS(nihtb_uc, file = "nihtb_uc.rds")
+saveRDS(nihtb_c, file = "nihtb_c.rds")
+saveRDS(nihtb_fc, file = "nihtb_fc.rds")
+
+saveRDS(nihtb, file = "~/Documents/abcd/neuropsych/nihtb.rds")
+```
+
+
+## NIH Toolbox (NIH Tbx) Picture Vocabulary - Language/vocabulary comprehension
+Language vocabulary knowledge, estimated verbal IQ; 
+  
+The Toolbox Picture Vocabulary Task® (TPVT) (Gershon et al., 2014, Gershon et al., 2013a) is a variant on the Peabody Picture Vocabulary Test (PPTV) and **measures language as well as verbal intellect. Children hear audio files of words and are shown four pictures in a square, one of which depicts the concept, idea or object referenced by the auditorily presented words. The child is asked to touch the picture that matches the word. The task uses CAT to ensure appropriate item difficulty in an efficient format.** In validation testing with children and adolescents, the **TPVT showed good test-retest reliability (ICC=0.81)**, expected age related effects, and strong convergent validity with the Peabody Picture Vocabulary Test (Gershon et al., 2014, Gershon et al., 2013a, Mungas et al., 2014).
+  
+## NIH Tbx Flanker Inhibitory Control & Attention  
+Attention, cognitive control, executive function, inhibition of automatic response  
+  
+The Toolbox Flanker Task® (TFT), a variant of the Eriksen Flanker task (Eriksen and Eriksen, 1974), was adapted from the Attention Network Task (Fan et al., 2002; Rueda et al., 2004). The task assesses the degree to which participants’ responses are influenced by whether surround stimuli and the target are either congruent or incongruent. There are two types of trial blocks, a somewhat easier block with fish (not used within ABCD), and then a somewhat harder block with arrows. Younger children perform the task with the fish as stimuli, and older children (starting at age 8years) are presented with the arrows. In both blocks, **the four flanking stimuli (2 on the outer left and 2 on the outer right) are all facing the same way, either left or right. The middle fish or arrow is then either facing the same way (congruent trial) or a different way (incongruent trial). Children have to push a button to indicate whether the middle stimulus is facing left or right. Scoring is based both on speed and accuracy.** In validation testing with children and adolescents, based on samples of 166–188 children (Zelazo et al., 2013), the TFT showed excellent **test-retest reliability (ICC=0.92)**, expected improvements in performance with increasing age, and some correlation with the D-KEFs Inhibition score (r=0.34) and a stronger correlation with WPPSI Block design (r=0.60), though with a relatively high correlation with the PPVT (r=0.44) (Zelazo et al., 2013). Convergent and divergent validity was better in adults, with good correlations of the TFT with D-KEFs Inhibition (r=0.52) and not with the PPVT (r=0.06) (Zelazo et al., 2014).
+
+## NIH Tbx List Sorting Working Memory  
+Working memory, information processing  
+The Toolbox List Sorting Working Memory Test® (TLSWMT) is a variant of the letter-number sequencing test (Gold et al., 1997) that uses pictures rather than words or letters (Tulsky et al., 2014, Tulsky et al., 2013). The basic task is to use working memory to sequence task stimuli based on category membership and perceptual characteristics. **Children are presented with a series of pictures of animals or foods of different sizes. Each picture is accompanied by the animal or food name presented auditorily by the iPad. The child is asked to repeat back to the experimenter the items that were presented, but in order from smallest to largest.** The TLSWMT starts by using only a single category (i.e., animals). Children are presented with a two-item list, and if they get it correct, the next trial increases to three items, and so on until a maximum of seven is reached. Children have two opportunities (different trials) to provide a correct answer at each list length, and continue on to the next length if they get at least one of the items correct. All children then progress to a next phase where the trials interleave two different categories (i.e., animals and food), regardless of how they did on the single category lists. For the interleaved trials, the child is asked to first organize and repeat back the items for one category (i.e., animals) and then the other category (i.e., food). As with the single category phase, children have two opportunities to achieve a correct response at each list length, and continue on up to a maximum length of seven if they get at least one right at the previous level. The experimenter scores the child’s response as correct or incorrect. In validation testing with children and adolescents, the TLSWMT showed good **test-retest reliability (ICC=0.86)**, expected age related effects, and reasonable convergent validity with the WISC-IV Letter-Number sequencing task (Tulsky et al., 2013). However, the TLSWMT also showed relatively strong correlations with the Peabody Picture Vocabulary Test (PPVT), the Delis-Kaplan Executive Function System (D-KEFS) Color-Word Interference Task and the Wisconsin Card Sort –64 Perseverative Errors (r’s=0.42 to 0.45), but these were not quite as high as its convergent correlation (r=0.57). The correlation of the TLSWMT with the PPVT was lower in an adult sample (r=0.24) (Tulsky et al., 2014).
+  
+## NIH Tbx Dimensional Change Card Sort    
+Executive function: set shifting, flexible thinking, concept formation  
+The Toolbox Dimensional Change Card Sort Task® (TDCCS) was based on the work of Zelazo and colleagues (Zelazo, 2006) and measures cognitive flexibility. In this task, **children are presented with objects at the bottom of the screen (i.e., white rabbit, green boat). The participant is asked to sort a third object presented in the middle of the screen by either color or shape to match one of the two objects on the bottom of the screen (Zelazo et al., 2014, Zelazo et al., 2013). They indicate their response by touch input. After initial practice, they first do a block of trials sorting on one of the dimensions, then they do a block of trials in which they are told to switch to the other dimension. Lastly, they do a block of trials where they alternate in pseudorandom order between sorting on shape versus color. The total score is based on both accuracy and reaction time.** Once again, in validation testing with children and adolescents, the TDCCS showed **excellent test-retest reliability (ICC=0.92)**, expected age related effects, and strong convergent validity with the D-KEFs Inhibition score (r=0.64), with a bit lower correlation with the PPVT (r=0.55). Convergent validity was again better in adults, with good correlations of the TFT with D-KEFs Inhibition (r=0.55) and not with the PPVT (r=0.06) (Zelazo et al., 2014).
+  
+## NIH Tbx Pattern Comparison Processing Speed 
+Information processing, processing speed  
+
+The Toolbox Pattern Comparison Processing Speed Test® (TPCPST) (Carlozzi et al., 2015, Carlozzi et al., 2014, Carlozzi et al., 2013) was modeled on the Pattern Comparison Task developed by Salthouse (Salthouse et al., 1991) and is a **measure of rapid visual processing. Children are shown two pictures and asked to determine by touch input whether the pictures are the same or not. The score is based on how many items they are able to complete correctly in a specific amount of time.** In validation testing with children and adolescents, the TPCPST showed **good test-retest reliability (ICC=0.84)**, expected age related effects, and some convergent validity with the Wechsler Preschool and Primary Scale of Intelligence (WPPSI) or Wechsler Intelligence Score for Children (WISC) Processing Speed Composite Tasks (Carlozzi et al., 2013). However, the TPCPST showed discriminant validity correlations with the PPVT that were as strong as the convergent validity correlations with the WPPSI/WISC Processing Speed composite in a child sample (Carlozzi et al., 2013), though not in an adult sample (Carlozzi et al., 2014).
+      
+## NIH Tbx Picture Sequence Memory  
+Episodic memory; sequencing
+The Toolbox Picture Sequence Memory Test® (TPSMT) was modeled after memory tests asking children to imitate a sequence of actions with props developed by Bauer and colleagues. **In the TPSMT, participants are presented with a series of fifteen pictures depicting activities or events that could occur in a particular setting (i.e., working on a farm) (Bauer et al., 2013, Dikmen et al., 2014)). They must reproduce the sequence as it was presented. The task is not speeded.**
+
+In validation testing with children and adolescents, the TPSMT showed moderate test-retest reliability (ICC=0.76) and expected age related effects (Bauer et al., 2013). There were moderate correlations with other memory tests such as the Rey Auditory Verbal Learning Test and the Benton Visual Retention Test (r=∼.47), but the correlation with the Peabody Picture Vocabulary Test was even higher (r=0.58) (Bauer et al., 2013). Again in adults, correlations of the TPSMT were higher with both the Rey (r=0.64) and the Benton (r=0.65), and much smaller with the PPVT (r=0.04) (Dikmen et al., 2014). Because the TPSMT does not employ delayed recall or recognition trials, the ABCD workgroup thought it critical to include a more comprehensive episodic memory measure (i.e., the RAVLT, described below).
+
+## NIH Tbx Oral Reading Recognition  
+Language/reading decoding Language, oral reading (decoding) skills, academic achievement
+The Toolbox Oral Reading Recognition Task® (TORRT) is a reading test that **asks individuals to pronounce single letters or words presented in the middle of the iPad screen (Gershon et al., 2014, Gershon et al., 2013a) and measures exposure to language materials as well as the cognitive skills involved in reading**. This task necessitates input by the tester, as the tester must learn the correct pronunciations through training materials and must score each letter/word pronunciation as correct or not correct. As with the TPVT, the TORRT uses CAT with items calibrated using IRT to ensure appropriate item difficulty in an efficient format. In validation testing with children and adolescents, it showed **excellent test-retest reliability (ICC=0.97)**, expected age related effects, and strong convergent validity with the Reading Subtest of the Wide Range Achievement Test (Gershon et al., 2014, Gershon et al., 2013a, Mungas et al., 2014).
+  
+## Measures derived from the Toolbox
+Each of the Toolbox® tasks produces a number of scores, some of which are adjusted based on whether information such as age, gender and race/ethnicity are entered at the start of testing. **All tasks provide raw scores, uncorrected standard scores, and age-corrected standard scores based on a normative sample of 2917 children and adolescents (Casaletto et al., 2015). Standard scores have a mean of 100 and a standard deviation of 15. One can also receive Fully Corrected T-Scores that take into account certain demographic characteristics such as gender, education, and race/ethnicity, which have a mean of 50 and a standard deviation of 10.** In addition to the scores for individual tasks, the Toolbox® also provides several **composites**, including a **1) Total Score Composite**, **2) a Crystalized Intelligence Composite (Tbx Picture Vocabulary and Tbx Oral Reading Recognition)** and **3) a Fluid Intelligence Composite (Toolbox Pattern Comparison Processing Speed Test, Tbx List Sorting Working Memory, Toolbox Picture Sequence Memory Test, Toolbox Flanker Task, Toolbox Dimensional Change Card Sort Task)** (Akshoomoff et al., 2013). These composite scores also show good test–retest reliabilities in both children and adults (Akshoomoff et al., 2013, Heaton et al., 2014)) as well as validity in children (Akshoomoff et al., 2013; Heaton et al., 2014).
+
+
+
+## Factor analysis of the NIH toolbox
+
+Tulsky, D. S., Holdnack, J. A., Cohen, M. L., Heaton, R. K., Carlozzi, N. E., Wong, A. W., ... & Heinemann, A. W. (2017). Factor structure of the NIH Toolbox Cognition Battery in individuals with acquired brain injury. Rehabilitation psychology, 62(4), 435.
+
+Confirmatory factor analyses supported a 5-factor solution that included:  
+1) reading    
+2) vocabulary    
+3) episodic memory  
+4) working memory  
+5) processing speed/executive functioning.  
+
+  
+# Rey Auditory Verbal Learning Test (RAVLT) -- ABCD Pearson Scores `abcd_ps01`
+
+Rey Auditory Verbal Learning Test – Verbal learning and memory; the task is administered according to standard instructions using a 15-item word list; there are five learning trials (Trials I-V), a distractor trial (Listb), measures of immediate recall (Trial VI) and 30-minute delayed recall (Trial VII); for all trials, the total correct is recorded together with the number of perseverations and intrusions. Details can be found in Strauss, E., Sherman, E.M.S., & Spreen, O., 2006; Lezak, M.D., Howieson, D.B., Bigler, E.D., & Tranel, D., 2012.
+
+(RAVLT) is a widely used test of **auditory learning, memory, and recognition**. Although variants of the test are thought to have been around since the early 1900s, English-language adaptations were first available in the middle of the 20th century (Taylor, 1959). The most commonly used versions allow one to ascertain multiple facets of memory, including short-term memory capacity, proactive and retroactive inhibition, retention, encoding versus retrieval, and subjective organization (Strauss et al., 2006). **This test requires participates to listen to and recall a list of 15 unrelated words over five learning trials. Following initial learning of the list, a distractor list of 15 words is presented, and the participant is asked to recall as many words from this second list as he/she is able. Next, recall of the initially learned list is assessed. To assess longer-term retention of the list, following a 30-min delay, during which participants engage in other tasks, recall is again assessed, as well as recognition via a forced-choice (yes/no) list of words.** Care is taken to assure that the intervening tasks are not verbal in nature. Given the ease of administration and normative data across childhood and adulthood (7–89 years: Strauss et al., 2006), this test has gained acceptance as a valuable measure of learning and memory across the lifespan. Alternate forms are available to facilitate longitudinal testing.
+
+Across childhood and adolescence, the RAVLT has been shown to be sensitive to memory deficits associated with neurodevelopmental disorders (Vakil et al., 2012) and psychopathology (Gunther et al., 2004), as well as exogenous influences, such as cannabis use (Solowij et al., 2011), highlighting its potential efficacy for assessing auditory learning and memory in the ABCD study. Internal reliability estimates for the total score are high (coefficient alpha∼0.90), and test-retest reliability is adequate (r-values∼0.60–.70 (van den Burg and Kingma, 1999).
+
+A search of the literature failed to reveal an acceptable computerized variant of the RAVLT. We worked with Pearson Assessments to create a customized automated version that built upon that group’s Q-interactive automated testing platform (http://www.helloq.com/home.html). Within the automated version, administered with an iPad, the investigator reads each word aloud at a pace of one word per second. The pacing is facilitated by the task program. As the participant recalls the words, the experimenter rapidly checks off each utterance using a stylus and an on-screen list. Perseverations are also marked, and intrusions can be manually logged. At the conclusion of the trial list, the program automatically calculates the number of correctly recalled words for each trial, the number of perseverations, and intrusions. Raw scores are generated, synchronized to the Pearson clinical assessments server, and then downloaded through an automated script to the ABCD central data repository.
+
+# Matrix Reasoning -- ABCD Pearson Scores `abcd_ps01`
+
+Matrix Reasoning Task – Measures fluid intelligence, visuospatial reasoning; the task is from the Wechsler Intelligence Scale for Children-V and administered using Pearson Clinical Assessment-s Q-interactive platform. Total raw scores, scaled scores (ranging from 0-19) and scores for each item are available. See Wechsler, D., 2014; Daniel, M.H., Wahlstrom, D. & Zhang, O., 2014.
+
+The automated version of the Matrix Reasoning subtest from the Wechsler Intelligence Test for Children-V (WISC-V: Wechsler, 2014) was selected for inclusion, because it is a well-validated and reliable measure of nonverbal reasoning (Wechsler, 2014), because it can be administered using automated technology (Q-interactive: Daniel et al., 2014), and because **fluid reasoning appears to be compromised by externalizing behaviors, including substance abuse (Keyes et al., 2017). On each trial of the task, the examinee views a visuospatial array consisting of a series of stimuli. The series is incomplete, and the participant must select from a list of four alternatives to complete it.** The task is administered using two iPads, one of which is controlled by the examiner to present each trial while the other is viewed by the child. The iPads are synchronized via Bluetooth connection. Standardized instructions are used and 32 possible trials are available. **Testing ends when the participant fails three consecutive items. The raw score (total number correct) across completed trials is tabulated and translated, using a normative database, into a standard score. The normative standard score mean is 10.0 with a standard deviation of 3.0, corresponding to an IQ score of 100 or in the average range.** The Matrix Reasoning task can be completed in under ten minutes for most participants. It measures **fluid reasoning, visual intelligence, part-whole spatial reasoning, perceptual organization, attention to visual detail, and sequencing.** Matrix Reasoning strongly represents the Fluid Reasoning factor of the WISC-V and correlates (r=0.67) with general ability (g). Split-half reliability is strong for children in the 9–10 year-old age range (r=0.87), and retest stability is acceptable (r=0.78). Given recent controversies regarding the association between substance misuse and IQ decline over time (Jackson et al., 2016; Meier et al., 2012), the Consortium recognized the importance of including measures of baseline fluid (Matrix Reasoning) and crystallized (NIH Toolbox Picture Vocabulary™) reasoning with the goal of re-assessing these skills over time.
+
+ABCD Pearson Scores - Rey Auditory Verbal Learning Test – Verbal learning and memory; the task is administered according to standard instructions using a 15-item word list; there are five learning trials (Trials I-V), a distractor trial (Listb), measures of immediate recall (Trial VI) and 30-minute delayed recall (Trial VII); for all trials, the total correct is recorded together with the number of perseverations and intrusions. Details can be found in Strauss, E., Sherman, E.M.S., & Spreen, O., 2006; Lezak, M.D., Howieson, D.B., Bigler, E.D., & Tranel, D., 2012.  
+Matrix Reasoning Task – Measures fluid intelligence, visuospatial reasoning; the task is from the Wechsler Intelligence Scale for Children-V and administered using Pearson Clinical Assessment-s Q-interactive platform. Total raw scores, scaled scores (ranging from 0-19) and scores for each item are available. See Wechsler, D., 2014; Daniel, M.H., Wahlstrom, D. & Zhang, O., 2014.
+  
+**RAVLT Short Delay Trial VI Total Correct**  
+RAVLT Short Delay Trial VI Total Repetitions  
+RAVLT Short Delay Trial VI Total Intrusions  
+**RAVLT Long Delay Trial VII Total Correct**  
+RAVLT Long Delay Trial VII Total Repetitions  
+RAVLT Long Delay Trial VII Total Intrusions
+
+```{r}
+# read information
+ravltraw = read.csv2("~/Documents/abcd/release2.0.1/abcd_ps01.txt", sep = "\t", header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+ravltraw <- ravltraw[-c(1),]
+# then refresh row index
+rownames(ravltraw) <- NULL
+
+ravlt <- ravltraw %>%
+  select(subjectkey, pea_ravlt_sd_trial_vi_tc, pea_ravlt_ld_trial_vii_tc) %>%
+  arrange(subjectkey)
+ravlt[, c(2:3) ]<- sapply(ravlt[, c(2:3)], as.numeric)
+
+
+saveRDS(ravlt, file = "ravlt.rds")
+ravlt <- readRDS(file = "~/Documents/abcd/neuropsych/ravlt.rds")
+
+hist(ravlt$pea_ravlt_sd_trial_vi_tc)
+hist(ravlt$pea_ravlt_ld_trial_vii_tc)
+
+```
+
+```{r}
+# read information
+ravltraw = read.csv2("~/Documents/abcd/release2.0.1/abcd_ps01.txt", sep = "\t", header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+ravltraw <- ravltraw[-c(1),]
+# then refresh row index
+rownames(ravltraw) <- NULL
+
+intrusions <- ravltraw %>%
+  select(subjectkey, pea_ravlt_sd_trial_vi_ti, pea_ravlt_ld_trial_vii_ti) %>%
+  arrange(subjectkey)
+intrusions[, c(2:3) ]<- sapply(intrusions[, c(2:3)], as.numeric)
+
+match_fhp <- readRDS(file="~/Documents/abcd/mentalhealth/match_fhp.rds")
+match_fhn <- readRDS(file="~/Documents/abcd/mentalhealth/match_fhn.rds")
+
+intrusions_fhp <- subset(intrusions, subjectkey %in% match_fhp$subjectkey)
+intrusions_fhp$group <- "FHP"
+intrusions_fhn <- subset(intrusions, subjectkey %in% match_fhn$subjectkey)
+intrusions_fhn$group <- "FHN"
+
+intrusions_merge <- merge(intrusions_fhp, intrusions_fhn, all = T)
+intrusions_merge$group <- factor(intrusions_merge$group) 
+
+intrusionsdemo_fhp <- Reduce(function(...) merge(..., all=T), 
+                                 list(intrusions_fhp, match_fhp))
+intrusionsdemo_fhn <- Reduce(function(...) merge(..., all=T), 
+                                 list(intrusions_fhn, match_fhn))
+
+intrusionsdemo_merge <- merge(intrusionsdemo_fhp, intrusionsdemo_fhn, all = T)
+intrusionsdemo_merge$group <- factor(intrusionsdemo_merge$group) 
+
+t.test(intrusions_fhp$pea_ravlt_sd_trial_vi_ti, intrusions_fhn$pea_ravlt_sd_trial_vi_ti)
+t.test(intrusions_fhp$pea_ravlt_ld_trial_vii_ti, intrusions_fhn$pea_ravlt_ld_trial_vii_ti)
+
+sdintru <- glm(group ~ pea_ravlt_sd_trial_vi_ti + combincome_simcat + parent_educomb_simcat, data = intrusionsdemo_merge, family = "binomial")
+summary (sdintru)
+
+ldintru <- glm(group ~ pea_ravlt_ld_trial_vii_ti + combincome_simcat + parent_educomb_simcat, data = intrusionsdemo_merge, family = "binomial")
+summary (ldintru)
+```
+
+
+WISC-V Matrix Reasoning Total Raw Score `pea_wiscv_trs`  
+**WISC-V Matrix Reasoning Total Scaled Score** `pea_wiscv_tss` 
+  
+A scaled score of 10 is the mean and scaled scores that deviate 3 units reflect a standard deviation. 
+
+```{r}
+# read information
+matrixreason = read.csv2("~/Documents/abcd/release2.0.1/abcd_ps01.txt", sep = "\t", header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+matrixreason <- matrixreason[-c(1),]
+# then refresh row index
+rownames(matrixreason) <- NULL
+
+matrixreason <- matrixreason %>%
+  select(subjectkey, pea_wiscv_trs, pea_wiscv_tss) %>%
+  arrange(subjectkey)
+matrixreason[, c(2:3) ]<- sapply(matrixreason[, c(2:3)], as.numeric)
+matrixreasonss <- matrixreason %>% select(subjectkey, pea_wiscv_tss)
+
+
+saveRDS(matrixreasonss, file = "matrixreasonss.rds")
+matrixreasonss <- readRDS(file = "~/Documents/abcd/neuropsych/matrixreasonss.rds")
+
+hist(matrixreason$pea_wiscv_trs)
+hist(matrixreason$pea_wiscv_tss)
+
+```
+
+
+  
+# Little Man Task (LMT) 
+    
+ABCD Little Man Task `lmtp201.txt`
+   
+As indicated above, in addition to providing a comprehensive assessment of development, another objective during battery development was to ensure that cognitive domains with particular vulnerability to alcohol/drug–related compromise were interrogated. The Little Man Task (LMT) was selected on the basis of both of these objectives. Developed by Acker and Acker (1982), **the task engages visual-spatial processing, specifically mental rotation with varying degrees of difficulty. Importantly, it is not a memory test. The task involves the presentation of a rudimentary male figure holding a briefcase in one hand in the middle of the screen. The figure may appear in one of four positions; right side up vs. upside down and either facing the respondent or with his back to the respondent. The briefcase may be in either the right or left hand. Using one of two buttons, respondents indicate which hand is holding the briefcase. The association between the button and response is held constant across trials and participants, i.e., there is no interference between hand and button (left hand always associated with a button to the left of the participant and which is labeled “left”).** Tests of face validity conducted during task development indicated **its sensitivity to visual spatial compromise (e.g., mental rotation).** Furthermore, although performance on the LMT has been correlated in prior studies with performance on the Block Design subtest of the WAIS, the tasks accounted for little shared variance (Acker and Acker, 1982). Thus, the task provides information regarding an important aspect of visual spatial function not assessed elsewhere in the battery. The LMT was favored over Block Design as a measure of **visuospatial reasoning**, because it is automated, reducing the burden on research staff, because it is child-friendly, and because it can be administered to all participants in a highly standardized fashion within a relatively brief period of time (e.g., 6–8minutes).
+
+Consistent with several studies with adults with substance use disorders, current instructions urge participants to respond as quickly, yet accurately as possible, i.e., emphasizing both accuracy and reaction time. After instruction, children complete practice trials with the aid of the research assistant. Following the practice trials, children complete 32 trials, across which the position of the figure has been counterbalanced. As noted by Kaplan (1988) and others, measures of endpoint performance, such as accuracy and reaction time, may be insensitive to subtle compromise. One of the strengths of the current performance variables is that a process variable, the efficiency ratio, derived from a ratio of the percent accurate/average reaction time for accurate responses can also be derived. Thus, in the current administration, we can review longitudinal changes in behavioral efficiency as well as track traditional measures of improvement such as increased accuracy and reduced reaction time.
+
+Historically, the task has been used in investigations of the neurobehavioral effects of substance use in adults (Acker and Acker, 1982; Glenn and Parsons, 1991; Lawton-Craddock et al., 2003; Nixon et al., 2014). 
+
+Percentage correct of all 32 presented trials  
+Percentage wrong (including timed out) out of 32 trials.  
+Number correct  
+Number wrong, not including timed out  
+Number timed out due to lack of response  
+Average reaction time for trials. Does not include timed out trials.  
+Average reaction for correct trials  
+Average reaction for incorrect trials. Does not include timed out.  
+LMT Efficiency - Percentage correct divided by average reaction for correct trials	  
+
+```{r}
+# read site information
+lmt = read.csv2("~/Documents/abcd/release2.0.1/lmtp201.txt", sep = "\t", header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+lmt <- lmt[-c(1),]
+# then refresh row index
+rownames(lmt) <- NULL
+
+lmt <- lmt %>%
+  select(4,10:18) %>%
+  arrange(subjectkey)
+lmt[, c(2:10)]<- sapply(lmt[, c(2:10)], as.numeric)
+
+lmt <- lmt %>% mutate(efficiency = (lmt_scr_perc_correct*100)/(lmt_scr_rt_correct/1000))
+
+lmteffi <- lmt %>% select(subjectkey, efficiency)
+
+
+saveRDS(lmteffi, file = "lmteffi.rds")
+lmteffi <- readRDS(file = "~/Documents/abcd/neuropsych/lmteffi.rds")
+
+hist(lmt$lmt_scr_perc_correct)
+hist(lmt$lmt_scr_rt_correct)
+hist(lmt$efficiency)
+```
+
+
+
+# Inter-temporal reward choice `cct01`
+A key goal of the ABCD study is to discover brain mechanisms of psychosocial and behavioral traits in childhood known to confer risk of substance use disorder (SUD) and other psychiatric disorders. **The most replicated finding in the behavioral economics of substance abuse is the exaggerated loss (relative to controls) in the subjective value of real or hypothetical rewards the longer the subject must wait to receive them (MacKillop et al., 2011)**. Importantly, this tendency is also found in children at risk for drug abuse and other poor outcomes (Casey et al., 2011). Seminal fMRI studies have implicated the dorsolateral prefrontal cortex (DLPFC) in decisions to defer gratification regarding real rewards (Kable and Glimcher, 2007; McClure et al., 2004) and at least one study has found that greater proportional gray matter in dorsolateral prefrontal cortex correlates with greater preference for larger delayed rewards (Bjork et al., 2009). For these reasons, inter-temporal reward choice behavior was viewed as an informative metric for inclusion in ABCD.
+  
+Our initial plan was to include a **delay discounting measure** given strong associations between temporal discounting and substance misuse (MacKillop et al., 2011). However, there were **concerns about task length, and the decision was made to defer this measure to later assessments. For brevity and to capture this construct at baseline, we elected to administer the one-item Cash Choice Task (Wulfert et al., 2002). The research assistant asks the child: “Let’s pretend a kind person wanted to give you some money. Would you rather have $75 in three days or $115 in 3 months?” and records the child’s response on the iPad.** The child indicates one of these two options or a third “can’t decide” option. The two monetary alternatives were recently found to have similar subjective value in 8th graders, where choice of the smaller-sooner amount correlated with questionnaire measures of real-world externalizing behavior (Warren Bickel, personal communication).
+
+ABCD Cash Choice Task - Impulsivity, delayed gratification; this single-item task asked the child “Let’s pretend a kind person wanted to give you some money. Would you rather have $75 in three days or $115 in 3 months?”. The child indicates one of these two options or a third “can’t decide” option. See Wulfert, E., Block, J.A., Santa Ana, E., Rodriguez, M.L., & Colsman, M., 2002; Anokhin, A.P., Golosheykin, S., Grant, J.D. & Heath, A.C., 2011.
+
+1 = $75 in three days;   
+2 = $115 in 3 months;   
+3 = Don't Know  
+
+```{r}
+# read information
+cct = read.csv2("~/Documents/abcd/release2.0.1/cct01.txt", sep = "\t", header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+cct <- cct[-c(1),]
+# then refresh row index
+rownames(cct) <- NULL
+
+cct <- cct %>%
+  select(subjectkey, cash_choice_task, eventname) %>%
+  filter(eventname == "baseline_year_1_arm_1")  %>% arrange(subjectkey) %>% select(-eventname)
+
+table(cct$cash_choice_task)
+
+saveRDS(cct, file = "cct.rds")
+cct <- readRDS(file = "~/Documents/abcd/neuropsych/cct.rds")
+```
+
+# Merge cognitive function measures
+
+```{r}
+nihtb <- readRDS(file = "~/Documents/abcd/neuropsych/nihtb.rds")
+ravlt <- readRDS(file = "~/Documents/abcd/neuropsych/ravlt.rds")
+matrixreasonss <- readRDS(file = "~/Documents/abcd/neuropsych/matrixreasonss.rds")
+lmteffi <- readRDS(file = "~/Documents/abcd/neuropsych/lmteffi.rds")
+normvis <- readRDS(file = "~/Documents/abcd/neuropsych/normvis.rds")
+
+cat("N NIH =", length(nihtb_uc$subjectkey), "\n")
+cat("N RAVLT =", length(ravlt$subjectkey), "\n")
+cat("N Matrix =", length(matrixreasonss$subjectkey), "\n")
+cat("N LMT =", length(lmteffi$subjectkey), "\n")
+cat("N normal vision =", length(normvis$subjectkey), "\n")
+```
+
+```{r}
+nihtb_normvis <- subset(nihtb, subjectkey %in% normvis$subjectkey)
+ravlt_normvis <- subset(ravlt, subjectkey %in% normvis$subjectkey)
+matrixreasonss_normvis <- subset(matrixreasonss, subjectkey %in% normvis$subjectkey)
+lmteffi_normvis <- subset(lmteffi, subjectkey %in% normvis$subjectkey)
+
+cat("N normal vision NIH =", length(nihtb_normvis$subjectkey), "\n")
+cat("N normal vision RAVLT =", length(ravlt_normvis$subjectkey), "\n")
+cat("N normal vision Matrix =", length(matrixreasonss_normvis$subjectkey), "\n")
+cat("N normal vision LMT =", length(lmteffi_normvis$subjectkey), "\n")
+```
+
+```{r}
+neuropsy <- Reduce(function(...) merge(...,  all = TRUE), 
+                   list(nihtb_normvis, ravlt_normvis,
+                        matrixreasonss_normvis, lmteffi_normvis))
+saveRDS(neuropsy, file = "~/Documents/abcd/neuropsych/neuropsy.rds")
+neuropsy <- readRDS(file = "~/Documents/abcd/neuropsych/neuropsy.rds")
+```
+

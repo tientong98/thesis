@@ -1,0 +1,141 @@
+---
+title: "Substance Use"
+output: html_notebook
+---
+
+Details in Lisdahl et al 2018  
+  
+Lifetime Use Interview (Lisdahl and Price, 2012) -- Lifetime patterns of use (ever used, lifetime quantity, first and regular use, length of abstinence)	-- All drug categories  
+
+Data in ABCD Youth Substance Use Interview -- `abcd_ysu02`  
+
+ABCD Youth Substance Use Interview: Data from this module will provide information in the following domains: 1) lifetime and recent quantity/frequency and patterns of substance use (including maximum dose, first use, first regular use, days of combined drug use) of all major drug categories (alcohol, nicotine, marijuana, caffeine, stimulants, ecstasy, depressants/sedatives, opiates, hallucinogens, steroids, and inhalants) with a timeline follow back and first-use assessment (first sip, first puff nicotine/ marijuana); 2) peer group substance use; 3) substance use attitudes, including intentions to use, perceived harm (added at 1-year follow-up), peer tolerance (added at 1-year follow-up), and expectancies of substance use (added at 1-year follow-up); 4) subjective response to substance use (alcohol, nicotine, marijuana); and 5) consequences of substance use, including alcohol hangover symptoms, alcohol consequences (RAPI), nicotine consequences (PATH Nicotine Dependence), marijuana consequences (MAPI), and other drug consequences (DAPI).  
+  
+**QUESTION** Variables of interest:  (DO I USE sip of alc, a puff of cig/mj? Currently include because I wanted true drug naive)  
+
+I want to start by asking if you have EVER TRIED any of the following drugs in your life. Have you ever tried___________at any time in your life?  
+  
+I believe these questions only showed up if participants answered 'yes' to 'have you ever heard of ____'
+  
+tlfb_alc_use 	A full drink of beer, wine or liquor (rum, vodka, gin, whiskey)    
+tlfb_cig_use	Tobacco cigarette - more than just a puff      
+tlfb_ecig_use	Electronic cigarettes, vape pens, or e-hookah - more than just a puff  
+tlfb_chew_use	Smokeless tobacco, "chew" or snus   
+tlfb_cigar_use	Cigars, including traditional cigars, little cigars, or cigarillos  
+tlfb_hookah_use	Hookah  
+tlfb_pipes_use	Pipes  
+tlfb_nicotine_use	Nicotine replacement, such as patches, gums, nasal sprays, inhalers, and lozenges.  
+tlfb_mj_use	Smoked marijuana, also called pot, grass, weed, ganja - more than just a puff?  
+tlfb_blunt_use	Blunts, when you combine tobacco and marijuana in joints. Interviewer note: Please clarify that if any tobacco product is used either as the wrapper or inside, code it as a blunt.  
+tlfb_edible_use	Marijuana that you eat, such as pot cookies, gummy bears, brownies.  
+tlfb_mj_conc_use	Marijuana oils or concentrates, such as "710"; hash oil; BHO/butane hash oil/dabs/shatter/budder/honey oil; Co2 oil/vaporizer pen; Rick Simpson Oil/RSO/phoenix tears  
+tlfb_mj_drink_use	Marijuana infused alcohol drinks  
+tlfb_tincture_use	Concentrated marijuana tinctures  
+tlfb_mj_synth_use	Fake marijuana or synthetics such as K2 and spice  
+tlfb_coc_use	Stimulant drugs such as cocaine, crack cocaine  
+tlfb_bsalts_use	Cathinones such as Bath salts, drone, M-cat, MDVP or meph?  
+tlfb_meth_use	Methamphetamine, meth, or crystal meth  
+tlfb_mdma_use	Ecstasy, molly, or MDMA  
+tlfb_ket_use	Ketamine or special K  
+tlfb_ghb_use	The depressant drug GHB, liquid G, or Georgia home boy?  
+tlfb_opi_use	Heroin, opium, junk, smack, or dope?  
+tlfb_hall_use	Hallucinogen drugs that cause people to see or experience things that are not real, such as LSD or acid, PCP or angel dust, peyote, mescaline, DMT, AMT, Foxy?  
+tlfb_shrooms_use	Hallucinogen drug: magic mushrooms or shrooms  
+tlfb_salvia_use	Hallucinogen drug: salvia  
+tlfb_steroids_use	Steroids such as arnolds, pumpers, or roids?  
+tlfb_bitta_use	Bittamugen or byphoditin  
+tlfb_sniff_use	Have you ever sniffed liquids, sprays or other products to get high?  
+tlfb_inhalant_use	Liquids, sprays, and gases that people sniff or inhale to get high or to make them feel good. (We are not interested in times when you inhaled a substance accidentally such as when painting, cleaning an oven, or filling a car with gasoline.) This includes substances like poppers, correction fluid, gasoline, glue, shoe polish, spray paints, or nitrous oxide of 'whippits'?  
+tlfb_amp_use	Used stimulant drugs such as amphetamine, Ritalin, Adderall, ephedrine in any way a doctor did not direct you to use them?  
+tlfb_cedrx_use	Prescription anxiolytics, tranquilizers, or sedatives in any way a doctor did not direct you to use them, such as Xanax, Ativan, Valium, Rohypnol, or sleeping pills?  
+tlfb_opiaterx_use	Prescription pain relievers such as Vicodin, Lortab, Norco, Hydrocodone, Oxycontin or Percocet that you used in any way a doctor did not direct you to use them (this does not include over-the-counter, pain relievers such as aspirin, Tylenol, Advil)?  
+tlfb_cough_use	Over the counter cough or cold medicine or DXM used just to get high?  
+tlfb_other_txt	Please specify "other" drug you have heard of
+tlfb_other_use	Have you ever used [tlfb_other_text]  
+
+
+0 = No; 1 = Yes 
+
+```{r}
+rm(list=ls())
+```
+
+
+```{r}
+data.dir <- ("~/Documents/abcd/substance/")
+setwd(data.dir)
+library(dplyr)
+
+drug = read.csv2("~/Documents/abcd/release2.0.1/abcd_ysu02.txt", sep = "\t", 
+                header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+# only include those without TBI and data from first assessment
+drug <- drug[-c(1),] %>%
+  filter(eventname == "baseline_year_1_arm_1") %>%
+  arrange(subjectkey) %>%
+  select(4,7,10,8,35:71) %>%
+  select(-tlfb_alc_sip, -tlfb_tob_puff, -tlfb_mj_puff)
+# then refresh row index
+rownames(drug) <- NULL
+
+drug[drug[,] == ""] <- 0
+drug[, c(2,3,5:38)] <- sapply(drug[, c(2,3,5:38)], as.numeric)
+drug$alldrug <- rowSums(drug[, c(5:38)])
+nodrug <- drug %>% filter(alldrug == 0)
+
+saveRDS(nodrug, file = "nodrug.rds")
+saveRDS(drug, file = "drug.rds")
+nodrug <- readRDS(file = "~/Documents/abcd/substance/nodrug.rds")
+
+```
+
+# Family History Positive:  
+Either Parent >= 2 symptoms: FHP 1108 
+546F & 562M
+     
+Excluding TBI Either Parent >= 2 symptoms: FHP 1043   
+518F & 525M
+
+Excluding extreme drug exposure: FHP 605   
+308F & 297M
+
+Excluding drug use: 597
+307F & 290M
+
+```{r}
+fhp2.notbi.preg <- readRDS(file = "~/Documents/abcd/mentalhealth/fhp_thresh2notbipreg.rds")
+
+fhp2.notbi.preg.nodrug <- subset(fhp2.notbi.preg, subjectkey %in% nodrug$subjectkey)
+  
+saveRDS(fhp2.notbi.preg.nodrug, 
+        file = "~/Documents/abcd/mentalhealth/fhp_thresh2notbipreggnodrug.rds")
+length(fhp2.notbi.preg.nodrug$subjectkey)
+table(fhp2.notbi.preg.nodrug$sex)
+```
+
+
+
+# Family History Negative:  
+Family History Negative: 6752         
+3255F  &  3496M (1 unspecified)  
+    
+Excluding TBI: 6530    
+3158  &  3371 (1 unspecified)  
+
+Excluding drug exposure: 5538  
+2679F  &  2858M (1 unspecified)
+
+Excluding substance use: 5504  
+2665 & 2838 (1 unspecified)
+
+```{r}
+fhn.notbi.preg <- readRDS(file = "~/Documents/abcd/mentalhealth/fhnnotbipreg.rds")
+
+fhn.notbi.preg.nodrug <- subset(fhn.notbi.preg, 
+                                    subjectkey %in% nodrug$subjectkey)
+  
+saveRDS(fhn.notbi.preg.nodrug, 
+        file = "~/Documents/abcd/mentalhealth/fhnnotbipregnodrug.rds")
+length(fhn.notbi.preg.nodrug$subjectkey)
+table(fhn.notbi.preg.nodrug$sex)
+```

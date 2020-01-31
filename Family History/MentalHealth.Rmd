@@ -1,0 +1,519 @@
+---
+title: "Mental Health"
+output: html_notebook
+---
+
+# Psychological Disorders
+participants will also be excluded for past or current diagnosis for schizophrenia, bipolar disorder, SUD, autism spectrum disorder, and Tic/Tourette's disorder  
+  
+(no tic/tourette data)  
+  
+## Psychosis
+
+The psychosis assessment in the KSADS-5 focuses on diagnostic symptoms, and may miss the subtler prodromal psychosis risk phenotypes. The full range of diagnostic and prodromal psychosis phenotype indicators may be important in understanding this relationship vis-a-vis substance use predictors and outcomes. Thus, we are supplementing the parent report on KSADS-5 with youth report on the Prodromal Questionnaire Brief Version (PQ-B)(Loewy et al., 2005, Loewy et al., 2012, Loewy et al., 2011, Ising et al., 2012, Therman et al., 2014) (annually) modified for use in children in our age range by Dr. Rachel Loewy and colleagues. The PQ-B shows good internal reliability (Fonseca-Pedrero et al., 2016, Xu et al., 2016) and convergent validity with clinician-measured assessment of psychosis risk symptoms (Loewy et al., 2011, Kline et al., 2012). The inclusion of an assessment of subclinical manifestations of psychosis will aid in addressing questions about the degree to which early experience of psychosis predict use of substances, versus substances eliciting and/or worsening experiences of psychosis. As noted below, the youth will be asked to self-report on psychosis at each in-person assessment (i.e., yearly).
+
+
+ABCD Youth Diagnostic Interview for DSM-5 (KSADS-5) `abcd_ksad01.txt`  
+ksads_4_851_p	Diagnosis - Unspecified Schizophrenia Spectrum and Other Psychotic Disorder F29 (Current)  	
+ksads_4_852_p	Diagnosis - Unspecified Schizophrenia Spectrum and Other Psychotic Disorder F29 (Past)  	
+ksads_4_826_p	Diagnosis - Hallucinations (Present)  	
+ksads_4_827_p	Diagnosis - Hallucinations (Past)  	
+ksads_4_829_p	Diagnosis - Delusions (Past)  	
+ksads_4_828_p	Diagnosis - Delusions (Present)  	
+ksads_4_850_p	Diagnosis - Associated Psychotic Symptoms Past  	
+ksads_4_849_p	Diagnosis - Associated Psychotic Symptoms Current  	
+		
+			
+SUBCLINICAL - ABCD Prodromal Psychosis Scale `pps01` - summary in ABCD Sum Scores Mental Health Youth `abcd_mhy01`
+
+pps_y_ss_severity_score Prodromal Psychosis: Severity Score Sum: (prodromal_1b_y, prodromal_2b_y, prodromal_3b_y, prodromal_4b_y, prodromal_5b_y, prodromal_6b_y, prodromal_7b_y, prodromal_8b_y, prodromal_9b_y, prodromal_10b_y, prodromal_11b_y, prodromal_12b_y, prodromal_13b_y, prodromal_14b_y, [prodromal_15b_y, prodromal_16b_y, prodromal_17b_y, prodromal_18b_y, prodromal_19b_y, prodromal_20b_y, prodromal_21b_y) + (pps_y_ss_ bother_n_1), If  this score = "",  then score = pps_y_ss_number;  No minimum number of answers to be valid 
+
+Loewy, R. L., Pearson, R., et al. (2011) Psychosis risk screening with the Prodromal Questionnaire--brief version (PQ-B). Schizophr Res 129(1): 42-46. In the Prodromal Psychosis survey, "How much did it bother you?" is typically scored 2 - 6. In the version used by ABCD,  this item was scored  1 - 5. Because the "Did it bother you" sum score is equal to the sum of the number of severity scores used in the severity score calculation, we were able to compensate for this scoring difference by adding the "Did it bother you" sum score to the severity score.  After applying this change, the severity scores reported here are comparable to those calculated using the  "How much did it bother you"  2 - 6  scoring range.
+
+## ASD: DO NOT USE THIS
+autism spectrum symptoms. The KSADS-5 includes assessment of autism spectrum symptoms. However, like psychosis, the assessment focuses on full-blown symptoms that likely miss the subtler autism spectrum indicators. Thus, we included the brief Social Responsiveness Scale (Reiersen et al., 2008) at the first annual assessment as a dimensional assessment of autism spectrum traits from the parent perspective.
+  
+SUBCLINICAL Parent Short Social Responsiveness Scale
+RAW ABCD Parent Short Social Responsiveness Scale  `abcd_pssrs01`
+SUMMARY ABCD Parent Short Social Responsiveness Scale (SSRS) -- in ABCD Sum Scores Mental Health Parent `abcd_mhp02`
+ssrs_p_ss_sum	SSRS sum[ssrs_15r, ssrs_6, ssrs_16, ssrs_18, ssrs_24, ssrs_29, ssrs_35, ssrs_37, ssrs_39, ssrs_42, ssrs_58] ; Validation: All items must be answered  
+ssrs_p_ss_sum_nm	SSRS Sum: Number Missing Questions  
+ssrs_ss_sum_nt	SSRS Sum: Number Total Questions  
+
+ksads_18_903_p	Diagnosis - Other Specified Neurodevelopmental Disorder Autism Spectrum Disorder full criteria not assessed (F88.0)
+
+# Mania -- BIPOLAR
+
+ksads_2_837_p	Diagnosis - Bipolar II Disorder most recent past hypomanic ξF31.81  	
+ksads_2_835_p	Diagnosis - Bipolar II Disorder currently hypomanic ξF31.81  	
+ksads_2_836_p	Diagnosis - Bipolar II Disorder currently depressed F31.81  	
+ksads_2_831_p	Diagnosis - Bipolar I Disorder current episode depressed F31.3x  	
+ksads_2_832_p	Diagnosis - Bipolar I Disorder currently hypomanic F31.0  	
+ksads_2_830_p	Diagnosis - Bipolar I Disorder current episode manic (F31.1x)  	
+ksads_2_833_p	Diagnosis - Bipolar I Disorder most recent past episode manic (F31.1x)  	
+ksads_2_834_p	Diagnosis - Bipolar I Disorder most recent past episode depressed (F31.1.3x)  	
+ksads_2_839_p	Diagnosis - Unspecified Bipolar and Related Disorder PAST (F31.9)  	
+ksads_2_838_p	Diagnosis - Unspecified Bipolar and Related Disorder current ξ(F31.9)  	
+
+Mania Symptoms	Parent General Behavior Inventory 10 item Mania Scale
+E.A. Youngstrom, T.W. Frazier, et al.
+Developing a 10-item mania scale from the Parent General Behavior Inventory for children and adolescents. J. Clin. Psychiatry, 69 (5) (2008), pp. 831-839
+
+Substance use disorders and bipolar disorder are frequently comorbid, although the mechanisms responsible for their co-occurrence remain unresolved (Strakowski and DelBello, 2000, Sherwood Brown et al., 2001, Levin and Hennessy, 2004). Moreover, there is clear evidence that heavy substance involvement complicates the course of bipolar disorder (Strakowski et al., 2000). Critically, this comorbidity is not limited to adulthood; evidence suggests that bipolar disorder in adolescence is associated with risk for the onset of substance use disorders and tobacco use and that this increased risk is not dependent upon co-occurring conduct disorder (Wilens et al., 1999, Wilens et al., 2008). Consequently, for those interested in the etiology of substance use disorders, symptoms of bipolar disorder represent an important risk domain to assess in youth. While bipolar disorder is one of the disorders assessed in the parent version of the KSADS-5, syndromal diagnosis may be relatively insensitive to lower-level symptomatology that, nonetheless, has etiological significance for early onset substance use and substance use disorders. Thus, we also assess dimensional mania symptoms (Sherwood Brown et al., 2001) using the ten-item Mania Scale (Youngstrom et al., 2008) derived from the 73-item Parent General Behavior Inventory (PGBI) for Children and Adolescents (Youngstrom et al., 2001), which itself is an adaption of the adult form originally developed by Depue and colleagues (Depue et al., 1989). In deriving this short form, Youngstrom and colleagues identified the PGBI items that loaded on a factor largely composed of items reflecting hypomania and biphasic symptoms (i.e., reflecting bipolar variability in mood and behavior) and that best discriminated participants with and without bipolar spectrum diagnoses. The resulting 10-item scale correlated highly (r = 0.95) with the 28-item factor scale that reflected biphasic and manic symptoms, and had excellent internal consistency (α = 0.92). Additionally, the ten-item Mania scale was able to discriminate among diagnostic groups with different mood disorders, ADHD, and unaffected youth. Thus, the Mania scale provides resolution of the relatively lower end bipolarity that is likely to be missed by syndromal diagnosis and provides a graded assessment of bipolarity that complements our other assessments in the psychopathology domain. As described below, parents will be asked to complete the 10-item Mania Scale at each in-person assessment (i.e., yearly).
+
+History of Mental Health and Substance Abuse Services -- Introduction to Kiddie Schedule for Affective Disorder and Schizophrenia K.A. Kobak, J. Kaufman Ksads-comp. Center for Telepsychology, Madison, WI (2015)
+
+# Tic: NO DATA - HAVE TO EMAIL NDA
+
+ksads_17_905_p	Diagnosis - Unspecified Tic Disorder past (F95.9)			
+ksads_17_904_p	Diagnosis - Unspecified Tic Disorder present ξ(F95.9)
+
+# exclude all psych (psychosis, bipolar, asd, tic)
+
+ABCD Youth Diagnostic Interview for DSM-5 (KSADS-5) `abcd_ksad01.txt`
+  
+ksads_4_851_p	Diagnosis - Unspecified Schizophrenia Spectrum and Other Psychotic Disorder F29 (Current)    	
+ksads_4_852_p	Diagnosis - Unspecified Schizophrenia Spectrum and Other Psychotic Disorder F29 (Past)    	
+ksads_4_826_p	Diagnosis - Hallucinations (Present)  	  
+ksads_4_827_p	Diagnosis - Hallucinations (Past)  	  
+ksads_4_829_p	Diagnosis - Delusions (Past)  	  
+ksads_4_828_p	Diagnosis - Delusions (Present)  	  
+ksads_4_850_p	Diagnosis - Associated Psychotic Symptoms Past    	
+ksads_4_849_p	Diagnosis - Associated Psychotic Symptoms Current    
+  
+ksads_18_903_p	Diagnosis - Other Specified Neurodevelopmental Disorder Autism Spectrum Disorder full criteria not assessed (F88.0)  DONT USE THIS!!!
+    
+ksads_2_837_p	Diagnosis - Bipolar II Disorder most recent past hypomanic ξF31.81  	  
+ksads_2_835_p	Diagnosis - Bipolar II Disorder currently hypomanic ξF31.81  	  
+ksads_2_836_p	Diagnosis - Bipolar II Disorder currently depressed F31.81  	  
+ksads_2_831_p	Diagnosis - Bipolar I Disorder current episode depressed F31.3x    	
+ksads_2_832_p	Diagnosis - Bipolar I Disorder currently hypomanic F31.0  	  
+ksads_2_830_p	Diagnosis - Bipolar I Disorder current episode manic (F31.1x)    	
+ksads_2_833_p	Diagnosis - Bipolar I Disorder most recent past episode manic (F31.1x)    	
+ksads_2_834_p	Diagnosis - Bipolar I Disorder most recent past episode depressed (F31.1.3x)    	
+ksads_2_839_p	Diagnosis - Unspecified Bipolar and Related Disorder PAST (F31.9)  	  
+ksads_2_838_p	Diagnosis - Unspecified Bipolar and Related Disorder current ξ(F31.9)   
+        
+ksads_17_905_p	Diagnosis - Unspecified Tic Disorder past (F95.9)			  
+ksads_17_904_p	Diagnosis - Unspecified Tic Disorder present ξ(F95.9)  
+  
+ksads_19_895_p	Diagnosis - Unspecified Alcohol-Related Disorder present (F10.99)  
+ksads_19_896_p	Diagnosis - Unspecified Alcohol-Related Disorder past (F10.99)  
+ksads_19_891_p	Diagnosis - Alcohol Use Disorder Present  
+ksads_19_892_p	Diagnosis - Alcohol Use Disorder Past  
+ksads_20_893_p	Diagnosis - Unspecified Substance Related Disorder Present (F10.99)  
+ksads_20_894_p	Diagnosis - Unspecified Substance Related Disorder Past (F10.99)  
+ksads_20_874_p	Diagnosis - Stimulant Use Disorder Present: Cocaine  
+ksads_20_883_p	Diagnosis - Stimulant Use Disorder Past: Cocaine  
+ksads_20_872_p	Diagnosis - Stimulant Use Disorder Present: ŒæAmphetamine-type substance  
+ksads_20_881_p	Diagnosis - Stimulant Use Disorder Past: ŒæAmphetamine-type substance  
+ksads_20_889_p	Diagnosis - Substance Use Disorder CURRENT  
+ksads_20_890_p	Diagnosis - Substance Use Disorder PAST   
+ksads_20_887_p	Diagnosis - Inhalant Use Disorder Past  
+ksads_20_878_p	Diagnosis - Inhalant Use Disorder Present  
+ksads_20_877_p	Diagnosis - Phencycllidine (PCP) Use Disorder Present  
+ksads_20_886_p	Diagnosis - Phencycllidine (PCP) Use Disorder Past  
+ksads_20_875_p	Diagnosis - Opiod Use Disorder Present  
+ksads_20_884_p	Diagnosis - Opiod Use Disorder Past  
+ksads_20_876_p	Diagnosis - Other Hallucinagen Use Disorder Present  
+ksads_20_885_p	Diagnosis - Other Hallucinagen Use Disorder Past  
+ksads_20_879_p	Diagnosis - Other Drugs Use Disorder Present    
+ksads_20_888_p	Diagnosis - Other Drugs Use Disorder Past    
+ksads_20_873_p	Diagnosis - Sedative Hypnotic or Anxiolytic Use Disorder Present    
+ksads_20_882_p	Diagnosis - Sedative Hypnotic or Anxiolytic Use Disorder Past    
+ksads_20_880_p	Diagnosis - Cannabis Use Disorder Past    
+ksads_20_871_p	Diagnosis - Cannabis Use Disorder Present    
+
+```{r}
+rm(list=ls())
+```
+	    
+ 
+  
+```{r}
+data.dir <- ("~/Documents/abcd/mentalhealth/")
+setwd(data.dir)
+library(dplyr)
+
+# read psych
+psychex = read.csv2("~/Documents/abcd/release2.0.1/abcd_ksad01.txt", sep = "\t", 
+                header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+# only include those without TBI and data from first assessment
+psychex <- psychex[-c(1),] %>%
+  filter(eventname == "baseline_year_1_arm_1") %>%
+  arrange(subjectkey) %>%
+  select(subjectkey, interview_age, sex, ksads_4_851_p, ksads_4_852_p, ksads_4_826_p,
+         ksads_4_827_p, ksads_4_829_p, ksads_4_828_p, ksads_4_850_p, ksads_4_849_p, 
+         ksads_2_837_p, ksads_2_835_p, ksads_2_836_p, ksads_2_831_p, 
+         ksads_2_832_p, ksads_2_830_p, ksads_2_833_p, ksads_2_834_p, ksads_2_839_p, 
+         ksads_2_838_p, ksads_19_895_p, ksads_19_896_p, 
+         ksads_19_891_p, ksads_19_892_p, ksads_20_893_p, ksads_20_894_p, ksads_20_874_p, 
+         ksads_20_883_p, ksads_20_872_p, ksads_20_881_p, ksads_20_889_p, ksads_20_890_p, 
+         ksads_20_887_p, ksads_20_878_p, ksads_20_877_p, ksads_20_886_p, ksads_20_875_p, 
+         ksads_20_884_p, ksads_20_876_p, ksads_20_885_p, ksads_20_879_p, ksads_20_888_p, 
+         ksads_20_873_p, ksads_20_882_p, ksads_20_880_p, ksads_20_871_p) 
+psychex[, c(2,4:47)] <- sapply(psychex[, c(2,4:47)], as.numeric)
+#psychex <- na.omit(psychex) 
+
+psychex$schizo <- rowSums(psychex[, c("ksads_4_851_p", "ksads_4_852_p", "ksads_4_826_p",
+                                      "ksads_4_827_p", "ksads_4_829_p", "ksads_4_828_p",
+                                      "ksads_4_850_p", "ksads_4_849_p")])
+
+psychex$bipolar <- rowSums(psychex[, c("ksads_2_837_p", "ksads_2_835_p",
+                                               "ksads_2_836_p", "ksads_2_831_p", 
+                                               "ksads_2_832_p", "ksads_2_830_p",
+                                               "ksads_2_833_p", "ksads_2_834_p",
+                                               "ksads_2_839_p", "ksads_2_838_p")])
+psychex$sud <- rowSums(psychex[,c("ksads_19_895_p", "ksads_19_896_p", "ksads_19_891_p",
+                                       "ksads_19_892_p", "ksads_20_893_p", "ksads_20_894_p",
+                                       "ksads_20_874_p", "ksads_20_883_p", "ksads_20_872_p",
+                                       "ksads_20_881_p", "ksads_20_889_p", "ksads_20_890_p",
+                                       "ksads_20_887_p", "ksads_20_878_p", "ksads_20_877_p",
+                                       "ksads_20_886_p", "ksads_20_875_p", "ksads_20_884_p",
+                                       "ksads_20_876_p", "ksads_20_885_p", "ksads_20_879_p",
+                                       "ksads_20_888_p", "ksads_20_873_p", "ksads_20_882_p",
+                                       "ksads_20_880_p", "ksads_20_871_p")])
+table(psychex$schizo)
+table(psychex$bipolar)
+table(psychex$sud)
+
+nopsychex <- psychex %>% filter(schizo == 0 & bipolar == 0 & sud ==0)
+
+# then refresh row index
+rownames(psychex) <- NULL
+
+saveRDS(nopsychex, file = "nopsychex.rds")
+write.table(psychex, file = "psychex.tsv", row.names = F, sep = "\t")
+nopsychex <- readRDS(file = "~/Documents/abcd/mentalhealth/nopsychex.rds")
+
+
+```
+
+# Family History Positive:  
+Either Parent >= 2 symptoms: FHP 1108 
+546F & 562M
+     
+Excluding TBI Either Parent >= 2 symptoms: FHP 1043   
+518F & 525M
+
+Excluding extreme drug exposure: FHP 605   
+308F & 297M
+
+Excluding drug use: 597
+307F & 290M
+
+Excluding psych (psychosis, bipolar, sud): 524
+274F & 250M 
+   
+
+```{r}
+fhp2.notbi.preg.nodrug <- readRDS(file =
+                                "~/Documents/abcd/mentalhealth/fhp_thresh2notbipreggnodrug.rds")
+
+
+fhp2.notbi.preg.nodrug.nopsy <- subset(fhp2.notbi.preg.nodrug, subjectkey %in% nopsychex$subjectkey)
+  
+saveRDS(fhp2.notbi.preg.nodrug.nopsy, 
+        file = "~/Documents/abcd/mentalhealth/fhp_thresh2notbipregnodrugnopsy.rds")
+length(fhp2.notbi.preg.nodrug.nopsy$subjectkey)
+table(fhp2.notbi.preg.nodrug.nopsy$sex)
+```
+
+# Family History Negative:  
+Family History Negative: 6752         
+3255F  &  3496M (1 unspecified)  
+    
+Excluding TBI: 6530    
+3158  &  3371 (1 unspecified)  
+
+Excluding drug exposure: 5538  
+2679F  &  2858M (1 unspecified)
+
+Excluding substance use: 5504  
+2665 & 2838 (1 unspecified)
+
+Excluding psych: 5024
+2449 & 2575 
+
+```{r}
+fhn.notbi.preg.nodrug <- readRDS(file = "~/Documents/abcd/mentalhealth/fhnnotbipregnodrug.rds")
+
+fhn.notbi.preg.nodrug.nopsy <- subset(fhn.notbi.preg.nodrug, subjectkey %in% nopsychex$subjectkey)
+  
+saveRDS(fhn.notbi.preg.nodrug.nopsy, 
+        file = "~/Documents/abcd/mentalhealth/fhnnotbipregnodrugnopsy.rds")
+length(fhn.notbi.preg.nodrug.nopsy$subjectkey)
+table(fhn.notbi.preg.nodrug.nopsy$sex)
+```
+
+  
+ksads_15_901_p	Diagnosis - Oppositional Defiant Disorder Present F91.3    
+ksads_15_902_p	Diagnosis - Oppositional Defiant Disorder Past F91.3    
+	    
+ksads_16_900_p	Diagnosis - Conduct Disorder past adolescent onset (F91.2)    
+ksads_16_897_p	Diagnosis - Conduct Disorder present childhood onset (F91.1)    
+ksads_16_899_p	Diagnosis - Conduct Disorder past childhood onset (F91.1)    
+ksads_16_898_p	Diagnosis - Conduct Disorder present adolescent onset (F91.2)    
+	    
+ksads_14_856_p	Diagnosis - Unspecified Attention-Deficit/Hyperactivity Disorder (F90.9)    
+ksads_14_855_p	Diagnosis - Attention-Deficit/Hyperactivity Disorder IN PARTIAL REMISSION    
+ksads_14_853_p	Diagnosis - Attention-Deficit/Hyperactivity Disorder Present    
+ksads_14_854_p	Diagnosis - Attention-Deficit/Hyperactivity Disorder Past    
+	    
+ksads_1_843_p	Diagnosis - Persistent Depressive Disorder (Dysthymia) PRESENT F34.1    
+ksads_1_845_p	Diagnosis - Persistent Depressive Disorder (Dysthymia) PAST F34.1    
+ksads_1_844_p	Diagnosis - Persistent Depressive Disorder (Dysthymia) In Partial Remission F34.1\
+ksads_1_840_p	Diagnosis - Major Depressive Disorder Present    
+ksads_1_841_p	Diagnosis - Major Depressive Disorder Current in Partial Remission (F32.4)    
+ksads_1_842_p	Diagnosis - Major Depressive Disorder Past (F32.9)    
+ksads_1_847_p	Diagnosis - Unspecified Depressive Disorder PAST (F32.9)    
+ksads_1_846_p	Diagnosis - Unspecified Depressive Disorder Current (F32.9)     
+	  
+ksads_5_906_p	Diagnosis - Other Specified Anxiety Disorder (Panic Disorder impairment does not meet full criteria) F41.8    
+ksads_5_907_p	Diagnosis - Other Specified Anxiety Disorder PAST (Panic Disorder impairment does not meet full criteria) F41.8    
+ksads_5_857_p	Diagnosis - Panic Disorder (F41.0) PRESENT    
+ksads_5_858_p	Diagnosis - Panic Disorder (F41.0) PAST    
+	  
+ksads_6_908_p	Diagnosis - Other Specified Anxiety Disorder (Agoraphobia impairment does not meet full criteria) F41.8    
+ksads_6_859_p	Diagnosis - Agoraphobia (F40.00) PRESENT    
+ksads_6_860_p	Diagnosis - Agoraphobia (F40.00) PAST    
+	    
+ksads_7_861_p	Diagnosis - Separation Anxiety Disorder (F93.00) PRESENT    
+ksads_7_909_p	Diagnosis - Other Specified Anxiety Disorder (Separation Anxiety Disorder impairment does not meet full criteria) F41.8    
+ksads_7_910_p	Diagnosis - Other Specified Anxiety Disorder (Separation Anxiety Disorder impairment does not meet full criteria) PAST F41.8  
+ksads_7_862_p	Diagnosis - Separation Anxiety Disorder (F93.00) PAST  
+	  
+ksads_8_864_p	Diagnosis - Social Anxiety Disorder (F40.10) PAST  
+ksads_8_863_p	Diagnosis - Social Anxiety Disorder (F40.10) PRESENT  
+ksads_8_912_p	Diagnosis - Other Specified Anxiety Disorder (Social Anxiety Disorder impairment does not meet minimum duration) PAST ŒæF41.8  
+ksads_8_911_p	Diagnosis - Other Specified Anxiety Disorder (Social Anxiety Disorder impairment does not meet minimum duration) F41.8  
+	  
+ksads_9_868_p	Diagnosis - Specific Phobia ŒæPAST (F40.2XX)  
+ksads_9_867_p	Diagnosis - Specific Phobia ŒæPRESENT (F40.2XX)  
+	  
+ksads_10_914_p	Diagnosis - Other Specified Anxiety Disorder (Generalized Anxiety Disorder impairment does not meet minimum duration) PAST ŒæF41.8  
+ksads_10_913_p	Diagnosis - Other Specified Anxiety Disorder (Generalized Anxiety Disorder impairment does not meet minimum duration) F41.8  
+ksads_10_869_p	Diagnosis - Generalized Anxiety Disorder ¬ä¬ó¬ñPresent (F41.1)  
+ksads_10_870_p	Diagnosis - Generalized Anxiety Disorder ¬ä¬ó¬ñPast (F41.1) 
+
+
+
+# IQ
+From Paulus et al 2019 Neuroimage
+2.3. Cognition (youth performance):
+The neurocognitive assessment included the NIH Toolbox (Luciana et al., 2018). For this report, measures of fluid intelligence (Li et al., 2004) (i.e., those abilities that rely on solving problems, thinking, acting quickly, and encoding new episodic memories) comprised of the Toolbox Pattern Comparison Processing Speed Test, List Sorting Working Memory Test, Picture Sequence Memory Test, Flanker Task, and Dimensional Change Card Sort Task. Crystalized intelligence (i.e., those abilities that are more dependent on experience, representing accumulated store of verbal knowledge or skills and rely more heavily on education and cultural exposure) was measured with the Toolbox Picture Vocabulary Task and Oral Reading Recognition Task (Akshoomoff et al., 2013).
+
+
+
+# Externalizing and internalizing problems
+
+## CBCL - parent completed  
+
+RAW ABCD Parent Child Behavior Checklist Raw Scores Aseba `abcd_cbcl01`    
+SUMMARY Child Behavior Check List Scores `abcd_cbcls01`
+
+It assessed internalizing (i.e., anxious, depressive, and overcontrolled) and externalizing (i.e., aggressive, hyperactive, noncompliant, and undercontrolled) behaviors  
+
+The CBCL/6-18 is to be used with children aged 6 to 18. It consists of 113 questions, scored on a three-point Likert scale (0=absent, 1= occurs sometimes, 2=occurs often). The time frame for item responses is the past six months.  
+
+The eight empirically-based syndrome scales are:
+  
+Aggressive Behavior  
+Rule-Breaking Behavior   
+Anxious/Depressed 
+Withdrawn/Depressed 
+Somatic Complaints 
+Attention Problems  
+Social Problems  
+Thought Problems
+
+There are two "broad band" scales that combine several of the syndrome scales: Internalizing problems sums the Anxious/depressed, Withdrawn-depressed, and Somatic complaints scores;  
+
+Externalizing problems combines Rule-breaking and Aggressive behavior.   
+
+There also is a Total problems score, which is the sum of the scores of all the problem items.  
+
+The CBCL also uses a normative sample to create standard scores. These compare the raw score to what would be typical compared to responses for youths of the same gender and similar age (the school-aged version splits the age groups into 6–10 years and 11–18 years). The standard scores are scaled so that 50 is average for the youth's age and gender, with a standard deviation of 10 points. Higher scores indicate greater problems. For each syndrome, Internalizing and Externalizing problem scales, and the total score, scores can be interpreted as falling in the normal, borderline, or clinical behavior. Any score that falls below the 93rd percentile is considered normal, scores between the 93-97th percentile are borderline clinical, and any score above the 97th percentile are in the clinical range.  
+
+
+
+```{r}
+cbcl = read.csv2("~/Documents/abcd/release2.0.1/abcd_cbcls01.txt", sep = "\t", 
+                 header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+# only include those without TBI and data from first assessment
+cbcl <- cbcl[-c(1),] %>%
+  filter(eventname == "baseline_year_1_arm_1") %>%
+  arrange(subjectkey)
+
+cbcl[, c(7,10:88)] <- sapply(cbcl[, c(7,10:88)], as.numeric)
+
+# then refresh row index
+rownames(cbcl) <- NULL
+
+saveRDS(cbcl, file = "~/Documents/abcd/mentalhealth/cbcl.rds")
+cbcl <- readRDS(file = "~/Documents/abcd/mentalhealth/cbcl.rds")
+ 
+```
+
+```{r}
+match_fhp <- readRDS(file="~/Documents/abcd/mentalhealth/match_fhp.rds")
+match_fhn <- readRDS(file="~/Documents/abcd/mentalhealth/match_fhn.rds")
+
+cbcl_fhp <- subset(cbcl, subjectkey %in% match_fhp$subjectkey)
+cbcl_fhp$group <- "FHP"
+cbcl_fhn <- subset(cbcl, subjectkey %in% match_fhn$subjectkey)
+cbcl_fhn$group <- "FHN"
+
+cbcl_merge <- rbind(cbcl_fhp, cbcl_fhn)
+match_merge <- readRDS(file="~/Documents/abcd/mentalhealth/match_merge.rds")
+
+cbcldemo_merge <- Reduce(function(...) merge(..., all=T), list(cbcl_merge, match_merge ))
+cbcldemo_merge$group <- as.factor(cbcldemo_merge$group)
+```
+
+
+```{r}
+internal <- glm(group ~ cbcl_scr_syn_internal_t + combincome_simcat + parent_educomb_simcat, data = cbcldemo_merge, family = "binomial")
+summary(internal)
+```
+
+
+```{r}
+external <- glm(group ~ cbcl_scr_syn_external_t + combincome_simcat + parent_educomb_simcat, data = cbcldemo_merge, family = "binomial")
+summary(external)
+```
+
+
+```{r}
+t.test(cbcl_fhp$cbcl_scr_syn_internal_r, cbcl_fhn$cbcl_scr_syn_internal_r)
+t.test(cbcl_fhp$cbcl_scr_syn_internal_t, cbcl_fhn$cbcl_scr_syn_internal_t)
+t.test(cbcl_fhp$cbcl_scr_syn_external_r, cbcl_fhn$cbcl_scr_syn_external_r)
+t.test(cbcl_fhp$cbcl_scr_syn_external_t, cbcl_fhn$cbcl_scr_syn_external_t)
+t.test(cbcl_fhp$cbcl_scr_syn_totprob_r, cbcl_fhn$cbcl_scr_syn_totprob_r)
+t.test(cbcl_fhp$cbcl_scr_syn_totprob_t, cbcl_fhn$cbcl_scr_syn_totprob_t)
+```
+
+```{r}
+ggplot(cbcl_merge, aes(group,cbcl_scr_syn_internal_t)) +
+  theme_bw() +
+  geom_violin() +
+  geom_boxplot(aes(col=group), lwd=1, position=position_dodge(3), 
+              width=0.3, outlier.shape=NA) + 
+  #ggtitle("Right Ventral Striatum") +
+  ylab("Internalizing Problems") +
+  theme(plot.title = element_text(size=16, face="bold", hjust = 0.5)) +
+  theme(axis.title.x=element_blank(),
+        axis.ticks.x=element_blank()
+  ) +
+  theme(legend.position = "none") +
+  geom_jitter(aes(group,cbcl_scr_syn_internal_t), size=2, shape=16, 
+              position=position_jitter(width = 0.1, height = 0)) +
+  theme(axis.text.x = element_text(size=14,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
+        axis.text.y = element_text(size=13,face="plain")) +
+  stat_summary(fun.y=mean, colour="red", geom="point", size=4) +
+  stat_compare_means(method = "t.test", label.x = 1.4)
+```
+
+```{r}
+ggbetweenstats(data = cbcl_merge, x = group, y = cbcl_scr_syn_internal_t, plot.type = "boxviolin", 
+               type = "p", effsize.type = "d", conf.level = 0.95, package = "ggsci", 
+               palette = "nrc_npg", k = 2, messages = FALSE, bf.message = F) +
+  ylab("Internalizing Problems")
+```
+
+
+```{r}
+ggplot(cbcl_merge, aes(group,cbcl_scr_syn_external_t)) +
+  theme_bw() +
+  geom_violin() +
+  geom_boxplot(aes(col=group), lwd=1, position=position_dodge(3), 
+              width=0.3, outlier.shape=NA) + 
+  #ggtitle("Right Ventral Striatum") +
+  ylab("Externalizing Problems") +
+  theme(plot.title = element_text(size=16, face="bold", hjust = 0.5)) +
+  theme(axis.title.x=element_blank(),
+        axis.ticks.x=element_blank()
+  ) +
+  theme(legend.position = "none") +
+  geom_jitter(aes(group,cbcl_scr_syn_external_t), size=2, shape=16, 
+              position=position_jitter(width = 0.1, height = 0)) +
+  theme(axis.text.x = element_text(size=14,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
+        axis.text.y = element_text(size=13,face="plain")) +
+  stat_summary(fun.y=mean, colour="red", geom="point", size=4) +
+  stat_compare_means(method = "t.test", label.x = 1.4)
+```
+
+```{r}
+library(ggstatsplot)
+
+ggbetweenstats(data = cbcl_merge, x = group, y = cbcl_scr_syn_external_t, plot.type = "boxviolin", 
+               type = "p", effsize.type = "d", conf.level = 0.95, package = "ggsci", 
+               palette = "nrc_npg", k = 2, messages = FALSE, bf.message = F) +
+  ylab("Externalizing Problems")
+```
+
+
+
+# Brief Problem Monitor (BPM-T) - teacher reports
+Achenbach (2009)
+
+RAW ABCD Youth Brief Problem Monitor `abcd_bpm01`  
+SUMMARY ABCD Summary Scores BPM and POA `abcd_yssbpm01`  
+  
+```{r}
+
+```
+
+# ksad
+
+ksads_14_856_p	Diagnosis - Unspecified Attention-Deficit/Hyperactivity Disorder (F90.9)  
+ksads_14_855_p	Diagnosis - Attention-Deficit/Hyperactivity Disorder IN PARTIAL REMISSION  
+ksads_14_853_p	Diagnosis - Attention-Deficit/Hyperactivity Disorder Present  
+ksads_14_854_p	Diagnosis - Attention-Deficit/Hyperactivity Disorder Past  
+ksads_15_901_p	Diagnosis - Oppositional Defiant Disorder Present F91.3  
+ksads_15_902_p	Diagnosis - Oppositional Defiant Disorder Past F91.3  
+ksads_16_900_p	Diagnosis - Conduct Disorder past adolescent onset (F91.2)  
+ksads_16_897_p	Diagnosis - Conduct Disorder present childhood onset (F91.1)  
+ksads_16_899_p	Diagnosis - Conduct Disorder past childhood onset (F91.1)  
+ksads_16_898_p	Diagnosis - Conduct Disorder present adolescent onset (F91.2)  
+  
+# Youth Diagnostic Interview for DSM-5 KSADS-5 self reported
+
+use parent reports
+
+# Impulsivity
+
+There is an intimate relationship between personality, mental health and substance involvement that is highly multifaceted and complex (Littlefield and Sher, 2016). Those traits that are most related to substance involvement (and externalizing behavior more generally) throughout the life span are those that are sometimes termed “impulsivity.” However, rather than referring to a single trait or even ‘supertrait,” psychometric research has revealed the various impulsivity traits represent distinct constructs. These constructs vary dramatically with respect to the degree they reflect differing higher-order traits such as those indexed by Big Three or Big Five models of personality (e.g., Digman, 1990, Goldberg, 1992, Zuckerman et al., 1993, John and Srivastava, 1999). Importantly, Whiteside and Lynam (Whiteside and Lynam, 2001) were able to identify four unique dimensions of impulsivity that could be interpreted as reflecting (lack of) premeditation (e.g., not thinking before acting), urgency (e.g., acting without thinking when upset, difficulty controlling emotions), sensation seeking, and (lack of) perseverance (e.g., giving up easily). On the basis of these analyses, Whiteside et al. (Whiteside et al., 2005) developed the four-factor scale of impulsivity entitled the UPPS (for urgency, perseverance, premeditation, and sensation seeking) Impulsive Behavior Scale. Based on evidence suggesting that the construct of urgency could be further broken down into two types(i.e., negative affect and positive affect) (Cyders and Smith 2008), the UPPS was revised to include both a measure of positive and of negative urgency, the 59 item UPPS-P (Cyders et al., 2007).
+
+A youth version consisting of 40-items covering the UPPS-P dimensions was subsequently developed (Zapolski et al., 2010). However, given the participant burden at baseline, we did not feel we could include the entire 40-item version. Consequently, we reached out to one of the co-developers of the youth version of the UPPS-P, Greg Smith, who was conducting a longitudinal study of the UPPS-P beginning with children of the approximate ABCD baseline age (5th grade students). For optimal properties in this longitudinal ABCD study, Smith recommended that we maintain compatibility with the short form developed by Lynam (Lynam (2013)) for adults to the extent possible. Smith then undertook a series of analyses on his cohort of over 1900 subjects studied over three years (Smith, unpublished communication, 2014). Specifically, he used Lynam’s exact short scales for negative urgency, lack of perseverance, and sensation seeking. For lack of planning, the child version only had 2 of the 4 items he used. For positive urgency, the child form had 3 of the 4 items he used. For lack of planning and positive urgency, Smith examined the internal consistency and corrected item-total correlations for all 8 items on the Lynam (Lynam, 2013) scale at 3 different waves of data: wave 1 (spring, 5th grade, when the kids were 10–11), wave 5 (spring, 7th grade), and wave 7 (spring, 8th grade). In all cases, the Lynam (2013) short scales looked adequate (given the short-form format with 4 items/scale) with the exception for lack of perseverance at ages 10–11 (α = 0.46; alpha increased to 0.68 by 7th grade). For lack of planning, Smith added two items with the highest corrected item-total correlations within that scale. For positive urgency, one item with the highest corrected item-total correlation was added to the scale. Using this approach, we developed a 20-item youth short version of the UPPS-P that maintained the response format of the original child version, and most of the children’s items that overlapped with the adult short form. The strategy that we adopted allows us to have reasonable harmonization of data obtained by other groups using the full-length child version and help us transition to the adult short form as our children become adolescents. Preliminary analyses based on the first 1167 ABCD participants showed reasonable internal consistency for negative urgency (0.65), positive urgency (0.77), lack of perseverance (0.67), and lack of planning (0.73) but relatively poor internal consistency for sensation seeking (0.49). We anticipate asking the youth to repeat self-report on the UPPS every two years at the longer bi-annual in-person assessment.
+
+# Behavioral inhibition and behavioral activation
+
+One year follow-up in-person assessments
+For mental health, we have the parents again complete a subset of the KSADS-5 modules (externalizing, eating disorders, and psychosis), the Child Behavior Checklist and the 10-item mania scale from the P-GBI. In addition, we are further assessing autism spectrum symptoms. The KSADS-5 includes assessment of autism spectrum symptoms. However, like psychosis, the assessment focuses on full-blown symptoms that likely miss the subtler autism spectrum indicators. Thus, we included the brief Social Responsiveness Scale (Reiersen et al., 2008) at the first annual assessment as a dimensional assessment of autism spectrum traits from the parent perspective. For the Youth, we have them complete the suicide questions from the KSADS-5 to ensure continuity in assessment of self-injury and suicidal thoughts and behaviors. We also have the child complete the same Brief Problem Monitor from the 6 month assessment (Achenbach, 2009) and the positive affect items from the NIH Toolbox. In addition, we added in a 7-item child report of mania called the 7-Up (Youngstrom et al., 2013), and a 10-item delinquency scale so that we have youth as well as parent reports on these types of behaviors. The delinquency scale is a shortened version of the scale developed for use in the Causes and Correlated of Delinquency Program (Hoeve et al., 2008, Theobald et al., 2014). Lastly, at the one year assessment, we also begin administering the Adverse Life Events Scale (Tiet et al., 2001, Grant et al., 2004) from the PhenX collection asking for both parent and youth reports about events that the youth has experienced.
+
+
+
+•	Age in months at the time of the interview (interview_age)
+This value has been calculated from the de-identified birth date (middle of the birth month date) and the assent signature time stamp (annual visits) or mypi_date for mid-year visits, and is the same for all sessions of the baseline visit for each participant (even when these fall on different days). 
+
+Imaging site
+Race
+Sex
+Age
+Handedness
+Pubertal status
+
+
+intracranial volume
+
+Examining, but not controlling for
+SES, 
+IQ, 
+internalizing disorders (major depressive disorder – MDD, anxiety disorder)  
+externalizing disorders (attention-deficit hyper-activity disorder – ADHD, conduct disorder – CD, and oppositional defiant disorder – ODD)
+

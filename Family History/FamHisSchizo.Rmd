@@ -1,0 +1,274 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+rm(list=ls())
+data.dir <- ("~/Documents/abcd/mentalhealth/")
+setwd(data.dir)
+library("dplyr")
+library("psych")
+library("stringr")
+```
+
+File name: fhxp201.txt
+Data dictionary: https://nda.nih.gov/data_structure.html?short_name=fhxp201
+
+`fam_history_8_yes_no`  
+8. Has ANY blood relative of your child ever had a period lasting six months when they saw visions or heard voices or thought people were spying on them or plotting against them?  
+
+fam_history_q8a_visions	biological father    
+fam_history_q8d_visions	biological mother    
+  
+q8k_full_sib_young1_visions full sibling-younger 	  	  
+q8k_full_sib_young2_visions full sibling-younger 		    
+q8k_full_sib_young3_visions	full sibling-younger      
+q8k_full_sib_young4_visions	full sibling-younger      
+q8k_full_sib_young5_visions full sibling-younger 		     
+q8l_full_sib_old1_visions	full sibling-older 	    
+q8l_full_sib_old2_visions	full sibling-older 	   
+q8l_full_sib_old3_visions	full sibling-older      
+q8l_full_sib_old4_visions	full sibling-older     
+q8l_full_sib_old5_visions full sibling-older   
+  
+fam_history_q8b_visions	paternal grandfather    
+fam_history_q8c_visions	paternal grandmother   
+  
+fam_history_q8e_visions	maternal grandfather    
+fam_history_q8f_visions maternal grandmother
+
+0 = No   
+1 = Yes   
+999 = Don't know   
+
+# FHP
+	 	  
+```{r}
+# read family history file
+schizo = read.csv2("~/Documents/abcd/release2.0.1/fhxp201.txt", sep = "\t", header = TRUE,
+               stringsAsFactors = F)
+# delete the first row, which is the description of each column, then select first degree relatives only
+schizo_firstdegree <- schizo[-c(1),] %>%
+  filter(visit == "baseline_year_1_arm_1") %>%
+  arrange(subjectkey) %>%
+  select(4, 59:107) %>%
+  select(subjectkey, fam_history_q8a_visions, fam_history_q8d_visions, q8k_full_sib_young1_visions,
+         q8k_full_sib_young2_visions, q8k_full_sib_young3_visions, q8k_full_sib_young4_visions,
+         q8k_full_sib_young5_visions, q8l_full_sib_old1_visions, q8l_full_sib_old2_visions,
+         q8l_full_sib_old3_visions, q8l_full_sib_old4_visions, q8l_full_sib_old5_visions)
+# then refresh row index
+rownames(schizo_firstdegree) <- NULL
+
+# remove all 999
+filterNA_firstdegree <- filter_all(schizo_firstdegree, any_vars(. == 999))
+`%notin%` <- Negate(`%in%`)
+schizonew_firstdegree <- subset(schizo_firstdegree, subjectkey %notin% filterNA_firstdegree$subjectkey)
+
+schizofhp <- filter_all(schizonew_firstdegree, any_vars(. == 1))
+saveRDS(schizofhp, file = "schizofhp.rds")
+schizofhp <- readRDS(file = "~/Documents/abcd/mentalhealth/schizofhp.rds")
+
+cat(paste('fhp of schizo:', length(schizofhp$subjectkey)))
+```
+
+
+# FHN
+
+```{r}
+# FHN = no 1st and 2nd degree relative had AUD 
+
+# delete the first row, which is the description of each column, then select all relatives 
+schizofhn <- schizo[-c(1),] %>%
+  filter(visit == "baseline_year_1_arm_1") %>%
+  arrange(subjectkey) %>%
+  select(4, 59:107) %>% filter(fam_history_8_yes_no == 0)
+
+
+saveRDS(schizofhn, file = "schizofhn.rds")
+schizofhn <- readRDS(file = "~/Documents/abcd/mentalhealth/schizofhn.rds")
+
+cat(paste('fhn of schizo:', length(schizofhn$subjectkey)))
+```
+
+## Psychosis
+
+The psychosis assessment in the KSADS-5 focuses on diagnostic symptoms, and may miss the subtler prodromal psychosis risk phenotypes. The full range of diagnostic and prodromal psychosis phenotype indicators may be important in understanding this relationship vis-a-vis substance use predictors and outcomes. Thus, we are supplementing the parent report on KSADS-5 with youth report on the Prodromal Questionnaire Brief Version (PQ-B)(Loewy et al., 2005, Loewy et al., 2012, Loewy et al., 2011, Ising et al., 2012, Therman et al., 2014) (annually) modified for use in children in our age range by Dr. Rachel Loewy and colleagues. The PQ-B shows good internal reliability (Fonseca-Pedrero et al., 2016, Xu et al., 2016) and convergent validity with clinician-measured assessment of psychosis risk symptoms (Loewy et al., 2011, Kline et al., 2012). The inclusion of an assessment of subclinical manifestations of psychosis will aid in addressing questions about the degree to which early experience of psychosis predict use of substances, versus substances eliciting and/or worsening experiences of psychosis. As noted below, the youth will be asked to self-report on psychosis at each in-person assessment (i.e., yearly).
+
+
+ABCD Youth Diagnostic Interview for DSM-5 (KSADS-5) `abcd_ksad01.txt`  
+Data dictionary: https://nda.nih.gov/data_structure.html?short_name=abcd_ksad01
+
+ksads_4_851_p	Diagnosis - Unspecified Schizophrenia Spectrum and Other Psychotic Disorder F29 (Current)  	
+ksads_4_852_p	Diagnosis - Unspecified Schizophrenia Spectrum and Other Psychotic Disorder F29 (Past)  	
+ksads_4_826_p	Diagnosis - Hallucinations (Present)  	
+ksads_4_827_p	Diagnosis - Hallucinations (Past)  	
+ksads_4_829_p	Diagnosis - Delusions (Past)  	
+ksads_4_828_p	Diagnosis - Delusions (Present)  	
+ksads_4_850_p	Diagnosis - Associated Psychotic Symptoms Past  	
+ksads_4_849_p	Diagnosis - Associated Psychotic Symptoms Current  	
+		
+
+```{r}
+data.dir <- ("~/Documents/abcd/mentalhealth/")
+setwd(data.dir)
+
+# read psych
+psych = read.csv2("~/Documents/abcd/release2.0.1/abcd_ksad01.txt", sep = "\t", 
+                header = TRUE, stringsAsFactors = F)
+
+schizosym <- psych[-c(1),]  %>%
+  filter(eventname == "baseline_year_1_arm_1") %>%
+  arrange(subjectkey) %>%
+  select(c(4,7,8,116:158))
+
+schizosym_fhp <- subset(schizosym, subjectkey %in% schizofhp$subjectkey)
+schizosym_fhp$group <- "FHP"
+schizosym_fhn <- subset(schizosym, subjectkey %in% schizofhn$subjectkey)
+schizosym_fhn$group <- "FHN"
+
+schizosym_fin <- merge(schizosym_fhp, schizosym_fhn, all = T)
+
+# diagnosis: columns 4:11
+# symtoms: columns 12:46
+
+schizosym_fin[, c(12:46)] <- sapply(schizosym_fin[, c(12:46)], as.numeric)
+schizosym_fin$anysymp <- rowSums(schizosym_fin[, c(12:46)], na.rm = T)
+
+write.table(schizosym_fin, "schizosymp.txt", row.names = F, sep = "\t")
+
+cat(paste('fhn no symptom:', nrow(schizosym_fin %>% filter(group == "FHN", anysymp == 0))), '\n')
+cat(paste('fhn at least 1 symptom:', nrow(schizosym_fin %>% filter(group == "FHN", anysymp > 0))), '\n')
+cat(paste('fhp no symptoms:', nrow(schizosym_fin %>% filter(group == "FHP", anysymp == 0))), '\n')
+cat(paste('fhp at least 1 symptom:', nrow(schizosym_fin %>% filter(group == "FHP", anysymp > 0))), '\n')
+
+```
+
+## Depression
+
+ksads_1_843_p	Diagnosis - Persistent Depressive Disorder (Dysthymia) PRESENT F34.1	
+ksads_1_845_p	Diagnosis - Persistent Depressive Disorder (Dysthymia) PAST F34.1	
+ksads_1_844_p	Diagnosis - Persistent Depressive Disorder (Dysthymia) In Partial Remission F34.1	
+ksads_1_840_p	Diagnosis - Major Depressive Disorder Present	
+ksads_1_841_p	Diagnosis - Major Depressive Disorder Current in Partial Remission (F32.4)	
+ksads_1_842_p	Diagnosis - Major Depressive Disorder Past (F32.9)	
+ksads_1_847_p	Diagnosis - Unspecified Depressive Disorder PAST (F32.9)	
+ksads_1_846_p	Diagnosis - Unspecified Depressive Disorder Current (F32.9)	
+ksads_1_172_p	Symptom - Weight Gain Past	
+ksads_1_168_p	Symptom - Weight Loss Past	
+ksads_1_171_p	Symptom - Weight Gain Present	
+ksads_1_167_p	Symptom - Weight Loss Present	
+ksads_1_3_p	Symptom - Irritability Present	
+ksads_1_4_p	Symptom - Irritability Past	
+ksads_1_156_p	Symptom - Insomnia when depressed Past	
+ksads_1_163_p	Symptom - Indecision Present	
+ksads_1_164_p	Symptom - Indecision Past	
+ksads_1_170_p	Symptom - Increased Appetite Past	
+ksads_1_169_p	Symptom - Increased Appetite Present	
+ksads_1_188_p	Symptom - No two month symptom-free interval Past	
+ksads_1_187_p	Symptom - No two month symptom-free interval Present	
+ksads_1_175_p	Symptom - Psychomotor Retardation Present	
+ksads_1_176_p	Symptom - Psychomotor Retardation Past	
+ksads_1_173_p	Symptom - Psychomotor Agitation in Depressive Disorder Present	
+ksads_1_174_p	Symptom - Psychomotor Agitation in Depressive Disorder Past	
+ksads_1_185_p	Symptom - Presence of two or more depressive symptoms Present	
+ksads_1_186_p	Symptom - Presence of two or more depressive symptoms Past	
+ksads_1_166_p	Symptom - Decreased Appetite Past	
+ksads_1_181_p	Symptom - Decreased Self-Esteem Present	
+ksads_1_165_p	Symptom - Decreased Appetite Present	
+ksads_1_182_p	Symptom - Decreased Self-Esteem Past	
+ksads_1_1_p	Symptom - Depressed Mood Present	
+ksads_1_2_p	Symptom - Depressed Mood Past	
+ksads_1_5_p	Symptom - Anhedonia Present	
+ksads_1_6_p	Symptom - Anhedonia Past	
+ksads_1_161_p	Symptom - Concentration Disturbance Present	
+ksads_1_162_p	Symptom - Concentration Disturbance Past	
+ksads_1_159_p	Symptom - Fatigue Present	
+ksads_1_160_p	Symptom - Fatigue Past	
+ksads_1_183_p	Symptom - Impairment in functioning due to depression Present	
+ksads_1_184_p	Symptom - Impairment in functioning due to depression Past	
+ksads_1_180_p	Symptom - Hopeless Past	
+ksads_1_179_p	Symptom - Hopeless Present	
+ksads_1_157_p	Symptom - Hypersomnia Present	
+ksads_1_158_p	Symptom - Hypersomnia Past	
+ksads_1_177_p	Symptom - Guilt Present	
+ksads_1_178_p	Symptom - Guilt Past	
+
+
+```{r}
+#read psych
+psych <- read.csv2("~/Documents/abcd/release2.0.1/abcd_ksad01.txt", sep = "\t", 
+                header = TRUE, stringsAsFactors = F)
+
+depress <- psych[-c(1),]  %>%
+  filter(eventname == "baseline_year_1_arm_1")
+
+myvar <- c(
+"subjectkey",
+"ksads_1_843_p",
+"ksads_1_845_p",
+"ksads_1_844_p",
+"ksads_1_840_p",
+"ksads_1_841_p",
+"ksads_1_842_p",
+"ksads_1_847_p",
+"ksads_1_846_p",
+"ksads_1_172_p",
+"ksads_1_168_p",
+"ksads_1_171_p",
+"ksads_1_167_p",
+"ksads_1_3_p",
+"ksads_1_4_p",
+"ksads_1_156_p",
+"ksads_1_163_p",
+"ksads_1_164_p",
+"ksads_1_170_p",
+"ksads_1_169_p",
+"ksads_1_188_p",
+"ksads_1_187_p",
+"ksads_1_175_p",
+"ksads_1_176_p",
+"ksads_1_173_p",
+"ksads_1_174_p",
+"ksads_1_185_p",
+"ksads_1_186_p",
+"ksads_1_166_p",
+"ksads_1_181_p",
+"ksads_1_165_p",
+"ksads_1_182_p",
+"ksads_1_1_p",
+"ksads_1_2_p",
+"ksads_1_5_p",
+"ksads_1_6_p",
+"ksads_1_161_p",
+"ksads_1_162_p",
+"ksads_1_159_p",
+"ksads_1_160_p",
+"ksads_1_183_p",
+"ksads_1_184_p",
+"ksads_1_180_p",
+"ksads_1_179_p",
+"ksads_1_157_p",
+"ksads_1_158_p",
+"ksads_1_177_p",
+"ksads_1_178_p"
+)
+
+depress <- depress[myvar]
+depress[,2:48] <- sapply(depress[,2:48], as.numeric)
+
+depress_fhp <- subset(depress, subjectkey %in% schizofhp$subjectkey)
+depress_fhp$group <- "FHP"
+depress_fhn <- subset(depress, subjectkey %in% schizofhn$subjectkey)
+depress_fhn$group <- "FHN"
+
+# diagnosis: columns 1:8
+# symtoms: columns 9:48
+
+depress_fhp$anysymp <- rowSums(depress_fhp[, c(9:48)], na.rm = T)
+
+
+cat(paste('fhp at least 1 depress symptom:', nrow(depress_fhp %>% filter(group == "FHP", anysymp > 0))), '\n')
+
+```

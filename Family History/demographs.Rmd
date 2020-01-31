@@ -1,0 +1,977 @@
+---
+title: "Demographic Information"
+output: html_notebook
+---
+
+This file will create an R object containing all demographic information that FHN and FHP have to be matched on:
+Imaging site  
+Sex  
+Age  
+Race  
+Handedness  
+Pubertal status  
+
+# Site infor + sex + age
+
+Site information is in this file `abcd_lt01.txt`
+get age from `substance`
+
+```{r}
+rm(list=ls())
+```
+
+
+```{r}
+data.dir <- ("~/Documents/abcd/demographics/")
+setwd(data.dir)
+library(dplyr)
+
+# read site information
+siteinfo = read.csv2("~/Documents/abcd/release2.0.1/abcd_lt01.txt", sep = "\t", header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+siteinfo <- siteinfo[-c(1),]
+# then refresh row index
+rownames(siteinfo) <- NULL
+
+# choose baseline data only, then sort by subjectkey
+siteinfo <- siteinfo %>%
+  filter(siteinfo$eventname == "baseline_year_1_arm_1") %>%
+  arrange(subjectkey) %>%
+  select(subjectkey, eventname, interview_date, interview_age, sex, site_id_l) %>%
+  rename(site = site_id_l)
+
+# Save and load the data
+saveRDS(siteinfo, file = "siteinfo.rds")
+siteinfo <- readRDS(file = "~/Documents/abcd/demographics/siteinfo.rds")
+
+table(siteinfo$site)
+table(siteinfo$sex)
+```
+
+# Race - parent reported for themselves Parent Multi-Group Ethnic Identity-Revised Survey (NOT USE)
+
+Details in Zucker et al 2018:
+
+Culture is another major influencing factor that manifests in a variety of behavioral domains, operates at both drug- and non-drug specific levels, and impacts both a child’s position and experience within their family as well as their experience of the broader sur- rounding environment. Developmental trends and age of substance abuse initiation vary in tandem with racial/ethnic background. African Americans have lower rates of illegal drug use as adolescents, but as they age they often show higher rates than the national average (Center for Behavioral Health Statistics and Quality, 2015; Feldstein Ewing et al., 2011). Latino adolescents (age 14–17) have a higher prevalence of several indices of drinking when compared to Black and White youth (Centers for Disease Control and Prevention, 2014). Asian American youth delay onset of substance use (Kosterman et al., 2000; Zapolski et al., 2014, respectively) while American Indian/Alaska Natives begin substance use earlier than national averages (Whitesell et al., 2014).
+  
+This variability may reflect racially and ethnically-linked socio-cultural factors or genetic differences that contribute to and/or corre- late with race/cultural group differences in risk or protective factors for use (Laland et al., 2010; Shih et al., 2012). In addition, racial/ethnic group membership is not a homogenous variable. There are substantive, often under-discussed within-group differences in substance use pat- terns that are missed in examinations of race/ethnicity. Unfortunately, such classifications tend to be categorized by census group, and omit examination of the nuanced nature of contributing cultures underneath each of these broader groupings (Iwamoto et al., 2016; Sanchez et al., 2014; Vaeth et al., 2012; Beals et al., 2003). In reality, the influence of cultural factors is highly nuanced, even impacting substance use tra- jectories by geographic location within a national origin group (Swendsen et al., 2009).
+  
+The ABCD study was designed to specifically explore these multiple sources of variance with a protocol that examines the influences of race/ethnicity on substance use from a multidimensional perspective. It thus includes measures of: (a) cultural practices and acculturation (language use, social affiliations, customs and traditions), (b) cultural identification (attachment to cultural groups, associated positive self- esteem); and (c) cultural values (belief systems and behaviors asso- ciated with a cultural or ethnic group) (cf. Sam and Berry, 2010; Schwartz et al., 2010, 2018). Given the geographic dispersion of the different cultural groups and the broadly population representative nature of the ABCD sample, sufficient variance exists to carry out this exploration. Solid estimates of these nuances are already possible with the current sample. Its descriptive statistics are as follows: Total Youth sample (as of 7/31/17), N = 4104 (M = 2162; F = 1932; Other sex/ gender = 10). Total parent sample N = 4098 (3622 mothers; 468 fa- thers; 8 other caretaker adults). Current distribution of ethnic identity in the sample is: 60% Whites, 20% Hispanics, 9% African Americans, 2% Asian, 9% other (i.e., Native Americans, Pacific Islanders, multi- ethnic).
+
+ABCD Parent Multi-Group Ethnic Identity-Revised Survey (MEIM). The data is in `abcd_meim01.txt`, this item `meim_ethnic_id_p`
+
+In terms of ethnic group, I consider myself to be
+1 = White/Caucasian Blanco / Caucásico ; 
+2 = Western European Europeo occidental (del oeste) ; 
+3 = Eastern European Europeo oriental (del este) ; 
+4 = Hispanic/Latino Hispano / Latino ; 
+5 = Black/African American Negro / Afroamericano ; 
+6 = Afro-Carribean/Indo-Carribbean/West Indian (i.e. Jamaica; 
+7 = East Asian (i.e. China; 
+8 = South Asian (i.e. India; 
+9 = Southeast Asian (i.e. Phillipines; 
+10 = American Indian/Alaska Native Indio Americano / Nativo de Alaska ; 
+11 = Middle Eastern/North African De Medio Oriente / Norteafricano ; 
+12 = Native Hawaiian or Pacific Islander Nativo de Hawaii o Islas del Pacífico ; 
+13 = Mixed Ethnicity Etnicidad Mixta ; 
+14 = Other Ethnicity Otro origen étnico ; 
+0 = None Ninguno ; 
+999 = Don't know No sé ; 
+777 = Refuse to answer Me Niego a responder
+
+```{r}
+
+# read site information
+race_p = read.csv2("~/Documents/abcd/release2.0.1/abcd_meim01.txt", sep = "\t", header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+race_p <- race_p[-c(1),]
+# then refresh row index
+rownames(race_p) <- NULL
+# rename race
+race_p$meim_ethnic_id_p <- factor(race_p$meim_ethnic_id_p, levels=c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0, 999, 777), labels=c("White", "Western European", "Eastern European", "Hispanic/Latino", "Black/African", "Afro-Carribean", "East Asian", "South Asian", "Southeast Asian", "American Indian/Alaska Native", "Middle Eastern/North African", "Native Hawaiian or Pacific Islander", "Mixed Ethnicity", "Other Ethnicity", "None", "Don't know", "Refuse to answer"))
+
+# choose baseline data only, then sort by subjectkey
+race_p <- race_p %>%
+  filter(race_p$eventname == "baseline_year_1_arm_1") %>%
+  arrange(subjectkey) %>%
+  select(subjectkey, meim_ethnic_id_p) %>%
+  rename(race_parent = meim_ethnic_id_p)
+
+# Save and load the data
+saveRDS(race_p, file = "race_p.rds")
+race_p <- readRDS(file = "~/Documents/abcd/demographics/race_p.rds")
+
+table(race_p$race_parent)
+prop.table(table(race_p$race_parent))
+
+```
+
+# Handedness
+From M. Luciana et al 2018
+Edinburgh Handedness Inventory–Short Form -- in `abcd_ehis01`
+
+A measure of handedness, the brief version of the Edinburgh Handedness Inventory (Oldfield, 1971; Veale, 2014), is administered. The brief form includes four items. The child is asked to report the hand that is typically used for writing, throwing, using a spoon, and using a toothbrush. A five-point scale is implemented for each item (always right hand, usually right hand, both hands equally, usually left hand, always left hand). A laterality quotient is derived across the four re- sponses that represents the extent to which participants are right- handed, left-handed, or ambidextrous. There are no exclusion criteria related to lateral dominance. Preliminary data from the first 2299 participants (53.8% male; 59% Caucasian) indicate that 77.7% are right-handed, 8.9% are ambidextrous, and 13.5% are left-handed. These proportions are consistent with population estimates of non- right-handedness (Lezak et al., 2012).
+
+Handedness score rating	-- ehi_y_ss_scoreb	
+1=right handed; 
+2=left handed; 
+3=mixed handed/
+
+/Calculation: if ((mean([ehi1b], [ehi2b], [ehi3b],[ehi4b]) < -60),2, if ((mean([ehi1b], [ehi2b], [ehi3b],[ehi4b]) > 60),1,3)); 1. Veale, J. F. (2014) Edinburgh Handedness Inventory - Short Form: a revised version based on confirmatory factor analysis. Laterality 19(2):164-77. //If mixed handed, use the hand that the child writes with for NeuroCog and fMRI tasks.
+
+```{r}
+# read site information
+handedness = read.csv2("~/Documents/abcd/release2.0.1/abcd_ehis01.txt", sep = "\t", header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+handedness <- handedness[-c(1),]
+# then refresh row index
+rownames(handedness) <- NULL
+# rename handedness
+handedness$ehi_y_ss_scoreb <- as.numeric(handedness$ehi_y_ss_scoreb)
+handedness$handednesscat <- factor(handedness$ehi_y_ss_scoreb, 
+                                      levels=c(1, 2, 3), labels=c("right handed", 
+                                                                  "left handed", 
+                                                                  "mixed handed"))
+
+# choose baseline data only, then sort by subjectkey
+handedness <- handedness %>%
+  filter(siteinfo$eventname == "baseline_year_1_arm_1") %>%
+  arrange(subjectkey) %>%
+  select(subjectkey, ehi_y_ss_scoreb, handednesscat) %>%
+  rename(handedness = ehi_y_ss_scoreb)
+
+# Save and load the data
+saveRDS(handedness, file = "handedness.rds")
+handedness <- readRDS(file = "~/Documents/abcd/demographics/handedness.rds")
+
+table(handedness$handednesscat)
+prop.table(table(handedness$handednesscat))
+```
+
+# Pubertal Status - Pubertal Development Scale, Petersen et al. (1988)
+
+From Barch et al 2018  
+  
+Both earlier and later puberty have been associated with a range of problems (Kaltiala-Heino et al., 2003). Further, there is increasing evidence that pubertal status is related in important and interesting ways to brain structure and function. As described in the paper on biomarker assessment in ABCD (this issue), we will be assessing pubertal hormones in saliva in all children. A physician assessment of Tanner stage would also provide additional converging evidence, but was deemed impractical due to cost and time considerations. We are therefore measuring parent reports of pubertal status and menstrual status using the Pubertal Development Scale (Petersen et al., 1988). This is a brief measure used by numerous prior studies that has acceptable reliability and validity in US samples (Brooks-Gunn et al., 1987; Petersen et al., 1988). Unpublished work has reported a correlation of 0.80 between Tanner stage based on parent report and Tanner stage based on pediatrician evaluation (Miller et al., 1988). The inclusion of this measure will allow us to assess the converging validity of parent report and hormonal assays. As described below, we also ask youth to self-report on their pubertal status. Pubertal status evaluations will be completed at each in-person assessment.  
+  
+Pubertal status. As noted above, puberty is a time of emerging risk for both mental health and substance use related behaviors. Thus, the youth battery asks for self-reports of pubertal status using the Pubertal Development Scale (Petersen et al. 1988). This will allow us to assess the converging validity of youth report with both parent report of Tanner staging and salivary hormonal assay data. As noted below, the youth will be asked to self-report on pubertal status at each in-person assessment (i.e., yearly).
+
+We also again assess pubertal development and menstrual status from both parent and youth using the same instruments as at baseline.  
+
+RAW SCORE -- ABCD Youth Pubertal Development Scale and Menstrual Cycle Survey History (PDMS) `abcd_ypdms01`
+
+RAW SCORE -- ABCD Parent Pubertal Development Scale and Menstrual Cycle Survey History (PDMS) `abcd_ppdms01`
+
+Petersen, A. C., Crockett, L., et al. (1988) A self-report measure of pubertal status: Reliability, validity, and initial norms. J Youth Adolesc 17(2): 117-133.
+
+ABCD Sum Scores Physical Health Youth `abcd_ssphy01`
+ABCD Youth Pubertal Development Scale and Menstrual Cycle Survey History (PDS)
+pds_y_ss_male_category --- Pubertal Developmental Scale Youth, Male Category: pds_y_ss_m_cat_sum (sum_y_m) = pds_bdyhair_y + pds_m4_y + pds_m5_y; 
+1 - prepuberty - sum_y_m = 3, 
+2 - early puberty - sum_y_m >= 4 and <= 5, 
+3 - mid puberty - sum_y_m >= 6 and <= 8, 
+4 - late puberty - sum_y_m >= 9 and <=11, 
+5 - post puberty - sum_y_m = 12; 
+Validation: All items must be answered
+
+pds_y_ss_female_category -- Pubertal Developmental Scale Youth, Female Category: pds_y_ss_f_cat_sum (sum_y_f) = pds_bdyhair_y + pds_4_2_y; 
+1 - prepuberty - sum_y_f = 2 and pds_5_y = 1, 
+2 - early puberty - sum_y_f = 3 and pds_5_y = 1, 
+3 - mid puberty - sum_y_f > 3 and pds_5_y = 4, 
+4 - late puberty - sum_y_f = <= 7 and pds_5_y = 4, 
+5 - post puberty - sum_y_f = 8 and pds_5_y = 4; Validation: All items must be answered
+
+```{r}
+# read site information
+puberty_y = read.csv2("~/Documents/abcd/release2.0.1/abcd_ssphy01.txt", sep = "\t", header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+puberty_y <- puberty_y[-c(1),]
+# then refresh row index
+rownames(puberty_y) <- NULL
+# rename handedness
+puberty_y$pds_y_ss_male_category <- factor(puberty_y$pds_y_ss_male_category,
+                                         levels=c(1, 2, 3, 4, 5),
+                                         labels=c("prepuberty", 
+                                                  "early puberty",
+                                                  "mid puberty",
+                                                  "late puberty",
+                                                  "post puberty"))
+puberty_y$pds_y_ss_female_category <- factor(puberty_y$pds_y_ss_female_category,
+                                         levels=c(1, 2, 3, 4, 5),
+                                         labels=c("prepuberty", 
+                                                  "early puberty",
+                                                  "mid puberty",
+                                                  "late puberty",
+                                                  "post puberty"))
+
+# choose baseline data only, then sort by subjectkey
+puberty_y <- puberty_y %>%
+  filter(puberty_y$eventname == "baseline_year_1_arm_1") %>%
+  arrange(subjectkey) %>%
+  select(subjectkey, pds_y_ss_male_category, pds_y_ss_female_category) %>%
+  rename(puberty_y_male = pds_y_ss_male_category, 
+         puberty_y_female = pds_y_ss_female_category)
+
+puberty_y$puberty_y = ifelse(!is.na(puberty_y$puberty_y_male),
+                          puberty_y$puberty_y_male,
+                          ifelse(!is.na(puberty_y$puberty_y_female),
+                                 puberty_y$puberty_y_female, NA))
+puberty_y$puberty_y <- factor(puberty_y$puberty_y,
+                                         levels=c(1, 2, 3, 4, 5),
+                                         labels=c("prepuberty", 
+                                                  "early puberty",
+                                                  "mid puberty",
+                                                  "late puberty",
+                                                  "post puberty"))
+puberty_y <- puberty_y %>%
+  select(subjectkey, puberty_y)
+  
+# Save and load the data
+saveRDS(puberty_y, file = "puberty_y.rds")
+puberty_y <- readRDS(file = "~/Documents/abcd/demographics/puberty_y.rds")
+
+table(puberty_y$puberty_y)
+prop.table(table(puberty_y$puberty_y))
+
+```
+
+
+ABCD Sum Scores Physical Health Parent `abcd_ssphp01`
+ABCD Parent Pubertal Development Scale and Menstrual Cycle Survey History (PDS) ABCD 
+
+Petersen, A. C., Crockett, L., et al. (1988) A self-report measure of pubertal status: Reliability, validity, and initial norms. J Youth Adolesc 17(2): 117-133.
+
+pds_p_ss_male_category	-- Pubertal Developmental Scale Parent: Male Category pds_p_m_cat_sum (sum_p_m) = pds_bdyhair_y + pds_m4_p + pds_m5_p; 
+1 - prepuberty sum_p_m = 3; 
+2 - early puberty sum_p_m >= 4 and <= 5; 
+3 - mid puberty sum_p_m >= 6 and <= 8; 
+4 - late puberty sum_p_m >= 9 and <= 11; 
+5 - post puberty sum_p_m = 12; 
+Validation: All items must be answered
+
+pds_p_ss_female_category	Pubertal Developmental Scale Parent: Female Category: pds_p_m_cat_sum (sum_p_f) = pds_2_p + pds_f4_p; 
+1 - prepuberty - sum_p_f = 2 and pds_f5_p = 1, 
+2 - early puberty - sum_p_f = 3 and pds_f5_p = 1, 
+3 - mid puberty - sum_p_f >= 3 and pds_f5_p = 1, 
+4 - late puberty - sum_p_f <= 7 and pds_f5_p = 4, 
+5 - post puberty - sum_p_f = 8 and pds_f5_p = 4; 
+Validation: All items must be answered  
+
+```{r}
+# read site information
+puberty_p = read.csv2("~/Documents/abcd/release2.0.1/abcd_ssphp01.txt", sep = "\t", header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+puberty_p <- puberty_p[-c(1),]
+# then refresh row index
+rownames(puberty_p) <- NULL
+# rename handedness
+puberty_p$pds_p_ss_male_category <- factor(puberty_p$pds_p_ss_male_category,
+                                         levels=c(1, 2, 3, 4, 5),
+                                         labels=c("prepuberty", 
+                                                  "early puberty",
+                                                  "mid puberty",
+                                                  "late puberty",
+                                                  "post puberty"))
+puberty_p$pds_p_ss_female_category <- factor(puberty_p$pds_p_ss_female_category,
+                                         levels=c(1, 2, 3, 4, 5),
+                                         labels=c("prepuberty", 
+                                                  "early puberty",
+                                                  "mid puberty",
+                                                  "late puberty",
+                                                  "post puberty"))
+
+# choose baseline data only, then sort by subjectkey
+puberty_p <- puberty_p %>%
+  filter(puberty_p$eventname == "baseline_year_1_arm_1") %>%
+  arrange(subjectkey) %>%
+  select(subjectkey, pds_p_ss_male_category, pds_p_ss_female_category) %>%
+  rename(puberty_p_male = pds_p_ss_male_category, 
+         puberty_p_female = pds_p_ss_female_category)
+
+puberty_p$puberty_p = ifelse(!is.na(puberty_p$puberty_p_male),
+                          puberty_p$puberty_p_male,
+                          ifelse(!is.na(puberty_p$puberty_p_female),
+                                 puberty_p$puberty_p_female, NA))
+
+puberty_p$puberty_pcat <- factor(puberty_p$puberty_p,
+                                         levels=c(1, 2, 3, 4, 5),
+                                         labels=c("prepuberty", 
+                                                  "early puberty",
+                                                  "mid puberty",
+                                                  "late puberty",
+                                                  "post puberty"))
+puberty_p <- puberty_p %>%
+  select(subjectkey, puberty_p, puberty_pcat)
+  
+# Save and load the data
+saveRDS(puberty_p, file = "puberty_p.rds")
+puberty_p <- readRDS(file = "~/Documents/abcd/demographics/puberty_p.rds")
+
+table(puberty_p$puberty_pcat)
+prop.table(table(puberty_p$puberty_pcat))
+
+```
+
+# Socioeconomic Status
+
+ABCD Parent Demographics Survey `pdem02.txt`: Demographics, race, gender, family structure, SES, education, occupation (includes Native American Acculturation Scale)
+
+demo_prim --You are the: 
+1 = Childs Biological Mother La madre biológica del niño / de la niña; 
+2 = Childs Biological Father El padre biológico del niño / de la niña; 
+3 = Adoptive Parent Padre o madre adoptivo(a); 
+4 = Childs Custodial Parent El padre o la madre que tiene la custodia del niño / de la niña; 
+5 = Other Otro
+
+`demo_ed_v2`	--What grade is the child in? If it is summer, indicate grade starting in the fall.
+0 = KINDERGARTEN Kinder ; 1 = 1ST GRADE 1.er grado ; 2 = 2ND GRADE 2.º grado ; 3 = 3RD GRADE 3.er grado ; 4 = 4TH GRADE 4.º grado ; 5 = 5TH GRADE 5.º grado ; 6 = 6TH GRADE 6.º grado ; 7 = 7TH GRADE 7.º grado ; 8 = 8TH GRADE 8.º grado ; 9 = 9TH GRADE 9.º grado ; 10 = 10TH GRADE 10.º grado ; 11 = 11TH GRADE 11.º grado ; 12 = 12TH GRADE 12.º grado
+
+
+demo_prnt_ed_v2 -- What is the highest grade or level of school you have completed or the highest degree you have received? ¿Cuál es su máximo nivel de estudios completados o el máximo título que ha recibido?
+
+// The following questions are about your partner. Your "partner" refers to any significant figure in your life that helps you in raising your child or has helped you for more than 2 years. This person should be involved 40% or more of the daily activities your child does. For example, your partner could be your spouse. However, your partner could also be your boyfriend/girlfriend or relative.
+
+demo_prtnr_ed_v2 -- What is the highest grade or level of school your partner completed or highest degree they received?
+
+0 = Never attended/Kindergarten only Nunca asistÃ?/Kinder solamente ; 
+1 = 1st grade 1.er grado ; 
+2 = 2nd grade 2.Âº grado ; 
+3 = 3rd grade 3.er grado ; 
+4 = 4th grade 4.Âº grado ; 
+5 = 5th grade 5.Âº grado ; 
+6 = 6th grade 6.Âº grado ; 
+7 = 7th grade 7.Âº grado ; 
+8 = 8th grade 8.Âº grado ; 
+9 = 9th grade 9.Âº grado ; 
+10 = 10th grade 10.Âº grado ; 
+11 = 11th grade 11.Âº grado ; 
+12 = 12th grade; 
+13 = High school graduate Preparatoria terminada ; 
+14 = GED or equivalent Diploma General de Equivalencia (GED) o equivalente ; 
+15 = Some college; 
+16 = Associate degree: Occupational; 
+17 = Associate degree: Academic Program TÃ?tulo de asociado: programa acadÃ©mico ; 
+18 = Bachelor's degree (ex. BA; 
+19 = Master's degree (ex. MA; 
+20 = Professional School degree (ex. MD; 
+21 = Doctoral degree (ex. PhD; 
+777 = Refused to answer Prefiero no responder ; 
+999 = Don't Know No lo sÃ©
+
+
+demo_comb_income_v2
+What is your TOTAL COMBINED FAMILY INCOME for the past 12 months? This should include income (before taxes and deductions) from all sources, wages, rent from properties, social security, disability and/or veteran's benefits, unemployment benefits, workman's compensation, help from relative (include child payments and alimony), and so on.
+1= Less than $5,000; 
+2=$5,000 through $11,999; 
+3=$12,000 through $15,999; 
+4=$16,000 through $24,999; 
+5=$25,000 through $34,999; 
+6=$35,000 through $49,999; 
+7=$50,000 through $74,999; 
+8= $75,000 through $99,999; 
+9=$100,000 through $199,999; 
+10=$200,000 and greater. 
+999 = Don't know No lo sÃ© ; 
+777 = Refuse to answer No deseo responder 
+If Separated/Divorced, please average the two household incomes. Si es Separado(a) / Divorciado(a), por favor promedie los dos ingresos familiares
+
+```{r}
+# read information
+demo = read.csv2("~/Documents/abcd/release2.0.1/pdem02.txt", sep = "\t", header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+demo <- demo[-c(1),]
+# then refresh row index
+rownames(demo) <- NULL
+#
+demo$demo_prim <- factor(demo$demo_prim,levels=c(1, 2, 3, 4, 5),
+                                         labels=c("Biological Mother", 
+                                                  "Biological Father",
+                                                  "Adoptive Parent",
+                                                  "Custodial Parent",
+                                                  "Other"))
+demo$gradeyouth <- as.numeric(demo$demo_ed_v2)
+# change parent and partner edu to numberic
+demo[,c(87,94)] <- sapply(demo[,c(87,94)], as.numeric)
+
+demo$eduparentcat <- factor(demo$demo_prnt_ed_v2,
+                         levels=c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,
+                                  14,15,16,17,18,19,20,21,777,999),
+                         labels=c("Never attended/Kindergarten only", "1st grade", 
+                                  "2nd grade", "3rd grade", "4th grade ", "5th grade",
+                                  "6th grade", "7th grade", "8th grade", "9th grade",
+                                  "10th grade", "11th grade", "12th grade",
+                                  "High school graduate",
+                                  "GED or equivalent Diploma ", "Some college",
+                                  "Associate degree: Occupational",
+                                  "Associate degree: Academic Program",
+                                  "Bachelor's degree", "Master's degree",
+                                  "Professional School degree", "Doctoral degree",
+                                  "Refused to answer", "Don't Know"))
+demo$demo_prnt_ed_v2 <- na_if(demo$demo_prnt_ed_v2, 999)
+demo$demo_prnt_ed_v2 <- na_if(demo$demo_prnt_ed_v2, 777)
+
+demo$edupartnercat <- factor(demo$demo_prtnr_ed_v2,
+                         levels=c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,
+                                  14,15,16,17,18,19,20,21,777,999),
+                         labels=c("Never attended/Kindergarten only", "1st grade", 
+                                  "2nd grade", "3rd grade", "4th grade ", "5th grade",
+                                  "6th grade", "7th grade", "8th grade", "9th grade",
+                                  "10th grade", "11th grade", "12th grade",
+                                  "High school graduate",
+                                  "GED or equivalent Diploma ", "Some college",
+                                  "Associate degree: Occupational",
+                                  "Associate degree: Academic Program",
+                                  "Bachelor's degree", "Master's degree",
+                                  "Professional School degree", "Doctoral degree",
+                                  "Refused to answer", "Don't Know"))
+demo$demo_prtnr_ed_v2 <- na_if(demo$demo_prtnr_ed_v2, 999)
+demo$demo_prtnr_ed_v2 <- na_if(demo$demo_prtnr_ed_v2, 777)
+
+demo$combincomecat <- factor(demo$demo_comb_income_v2,
+                          levels=c(1,2,3,4,5,6,7,8,9,10,999,777),
+                          labels=c(">$5K", "$5K-$11,999", 
+                                   "$12K-$15999", "$16K-$24999",
+                                   "$25K-$34999", "$35K-$49999",
+                                   "$50K-$74999", "$75K-$99999",
+                                   "$100K-$199999", "$200K+", 
+                                   "Don't know", "Refuse to answer")) 
+demo$demo_comb_income_v2 <- as.numeric(demo$demo_comb_income_v2)
+demo$demo_comb_income_v2 <- na_if(demo$demo_comb_income_v2, 777)
+demo$demo_comb_income_v2 <- na_if(demo$demo_comb_income_v2, 999)
+
+# choose baseline data only, then sort by subjectkey
+ses <- demo %>%
+  filter(demo$eventname == "baseline_year_1_arm_1") %>%
+  arrange(subjectkey) %>%
+  select(subjectkey, demo_prim, gradeyouth, demo_prnt_ed_v2, eduparentcat, 
+         demo_prtnr_ed_v2, edupartnercat, demo_comb_income_v2, combincomecat) %>%
+  rename(eduparent = demo_prnt_ed_v2, edupartner = demo_prtnr_ed_v2,
+         combincome = demo_comb_income_v2)
+
+# change income to simpler categories (based on Thompson et al 2019)
+# Household Income 
+#  <50K
+#  >=50K & <100K
+#  >=100K
+
+ses$combincome_sim <- ifelse(1 <=ses$combincome & ses$combincome <= 6, 1,
+                      ifelse(7 <=ses$combincome & ses$combincome <= 8, 2,
+                      ifelse(9 <=ses$combincome & ses$combincome <= 10, 3, NA)))
+ses$combincome_sim <- as.numeric(ses$combincome_sim)
+ses$combincome_simcat <- factor(ses$combincome_sim,
+                          levels=c(1,2,3),
+                          labels=c("<$50K", ">=50K & <100K", 
+                                   ">=100K")) 
+
+# choose parent with higher edu
+ses$parent_educomb <- ifelse(is.na(ses$eduparent) & is.na(ses$edupartner), NA,
+                      ifelse(is.na(ses$eduparent) & !is.na(ses$edupartner), ses$edupartner,
+                      ifelse(!is.na(ses$eduparent) & is.na(ses$edupartner), ses$eduparent,
+                      ifelse(ses$eduparent > ses$edupartner, ses$eduparent,
+                      ifelse(ses$eduparent < ses$edupartner, ses$edupartner,
+                      ifelse(ses$eduparent == ses$edupartner, ses$eduparent, ""))))))
+ses$parent_educomb <- as.numeric(ses$parent_educomb)
+ses$parent_educombcat <- factor(ses$parent_educomb,
+                         levels=c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,
+                                  14,15,16,17,18,19,20,21),
+                         labels=c("Never attended/Kindergarten only", "1st grade", 
+                                  "2nd grade", "3rd grade", "4th grade ", "5th grade",
+                                  "6th grade", "7th grade", "8th grade", "9th grade",
+                                  "10th grade", "11th grade", "12th grade",
+                                  "High school graduate",
+                                  "GED or equivalent Diploma ", "Some college",
+                                  "Associate degree: Occupational",
+                                  "Associate degree: Academic Program",
+                                  "Bachelor's degree", "Master's degree",
+                                  "Professional School degree", "Doctoral degree"))
+
+# change combined parent edu to simpler categories
+# Thompson et al. - 2019
+# Highest Parental Education
+#  < HS Diploma
+#  HS Diploma/GED
+#  Some College
+#  Bachelor
+#  Post Graduate Degree
+
+ses$parent_educomb_sim <- ifelse(0 <= ses$parent_educomb & ses$parent_educomb <= 12, 1,
+                      ifelse(13 <= ses$parent_educomb & ses$parent_educomb <= 14, 2,
+                      ifelse(15 == ses$parent_educomb, 3, 
+                      ifelse(16 <= ses$parent_educomb & ses$parent_educomb <= 18, 4,
+                      ifelse(19 <= ses$parent_educomb & ses$parent_educomb <= 21, 5, NA)))))
+ses$parent_educomb_sim <- as.numeric(ses$parent_educomb_sim)
+ses$parent_educomb_simcat <- factor(ses$parent_educomb_sim,
+                          levels=c(1,2,3,4,5),
+                          labels=c("< HS Diploma", "HS Diploma/GED", 
+                                   "Some College", "Bachelor", "Post Graduate Degree")) 
+
+drug <- readRDS(file = "~/Documents/abcd/substance/drug.rds")
+ses$age_year <- drug$tlfb_age
+
+saveRDS(ses, file = "ses.rds")
+ses <- readRDS(file = "~/Documents/abcd/demographics/ses.rds")
+
+
+
+
+table(ses$gradeyouth)
+table(ses$demo_prim)
+table(ses$parent_educomb_simcat)
+table(ses$combincome_simcat)
+```
+
+# Youth's race based on parent's report
+
+ABCD Parent Demographics Survey `pdem02.txt`: Demographics, race, gender, family structure, SES, education, occupation (includes Native American Acculturation Scale)
+
+demo_race_a_p___10	10, White   
+demo_race_a_p___11	11, Black/African American   
+demo_race_a_p___12	12, American Indian, Native American   
+demo_race_a_p___13	13, Alaska Native   
+demo_race_a_p___14	14, Native Hawaiian  
+demo_race_a_p___15	15, Guamanian   
+demo_race_a_p___16	16, Samoan  
+demo_race_a_p___17	17, Other Pacific Islander   
+demo_race_a_p___18	18, Asian Indian   
+demo_race_a_p___19	19, Chinese   
+demo_race_a_p___20	20, Filipino   
+demo_race_a_p___21	21, Japanese   
+demo_race_a_p___22	22, Korean  
+demo_race_a_p___23	23, Vietnamese   
+demo_race_a_p___24	24, Other Asian   
+demo_race_a_p___25	25, Other Race    
+demo_race_a_p___77	77, Refuse To Answer   
+demo_race_a_p___99	99, Don't Know
+  
+demo_ethn_v2  Do you consider the child Hispanic/Latino/Latina? ¬øConsidera que el/la ni√±o(a) es hispano(a) o latino(a)?  
+1 = Yes SÃ; 2 = No No; 777 = Refuse to answer Niego contestar; 999 = Don't know No lo sÃ©
+  
+
+```{r}
+library(stringr)
+library(dplyr)
+
+# read demo information
+demo = read.csv2("~/Documents/abcd/release2.0.1/pdem02.txt", sep = "\t", header = TRUE, stringsAsFactors = F)
+# delete the first row, which is the description of each column
+demo <- demo[-c(1),]
+# then refresh row index
+rownames(demo) <- NULL
+
+race_y <- demo %>% 
+  filter(eventname == "baseline_year_1_arm_1") %>%
+  select(4,17:34,36) %>%
+  arrange(subjectkey) %>%
+  rename(White = demo_race_a_p___10, Black = demo_race_a_p___11,
+         NativeAmerican = demo_race_a_p___12, AlaskaNative = demo_race_a_p___13,
+         NativeHawaiian	= demo_race_a_p___14,
+         Guamanian = demo_race_a_p___15, Samoan = demo_race_a_p___16, 
+         OtherPacificIslander = demo_race_a_p___17, AsianIndian = demo_race_a_p___18,
+         Chinese = demo_race_a_p___19, Filipino = demo_race_a_p___20, 
+         Japanese = demo_race_a_p___21, Korean = demo_race_a_p___22,
+         Vietnamese = demo_race_a_p___23, OtherAsian = demo_race_a_p___24,
+         OtherRace = demo_race_a_p___25, RefuseToAnswer = demo_race_a_p___77,
+         DontKnow = demo_race_a_p___99, Hispanic = demo_ethn_v2)
+race_y$Hispanic[race_y$Hispanic == 1] <- 1
+race_y$Hispanic[race_y$Hispanic == 2] <- 0
+
+movetolast <- function(data, move) {
+  data[c(setdiff(names(data), move), move)]
+}
+race_y <- movetolast(race_y, c("OtherRace","RefuseToAnswer", "DontKnow"))
+write.csv(race_y, file = "race_y.csv", row.names = F)
+
+race_y$race_youth <- ifelse(rowSums(sapply(race_y[, c(1:16)], as.numeric), 
+                                     na.rm = T) > 1, "Mixed",
+                 ifelse(race_y$Hispanic == 1, "Hispanic",
+                 ifelse(race_y$White == 1, "White",
+                 ifelse(race_y$Black == 1, "Black",
+                 ifelse(race_y$NativeAmerican == 1, "NativeAmerican",
+                 ifelse(race_y$AlaskaNative == 1, "AlaskaNative",
+                 ifelse(race_y$NativeHawaiian == 1, "NativeHawaiian",
+                 ifelse(race_y$Guamanian == 1, "Guamanian",
+                 ifelse(race_y$Samoan == 1, "Samoan",
+                 ifelse(race_y$OtherPacificIslander == 1, "OtherPacificIslander",
+                 ifelse(race_y$AsianIndian == 1, "AsianIndian",
+                 ifelse(race_y$Chinese == 1, "Chinese",
+                 ifelse(race_y$Filipino == 1, "Filipino",
+                 ifelse(race_y$Japanese == 1, "Japanese",
+                 ifelse(race_y$Korean == 1, "Korean",
+                 ifelse(race_y$Vietnamese == 1, "Vietnamese",
+                 ifelse(race_y$OtherAsian == 1, "OtherAsian",
+                 ifelse(race_y$OtherRace == 1, "OtherRace",
+                 ifelse(race_y$RefuseToAnswer == 1, "RefuseToAnswer",
+                 ifelse(race_y$DontKnow == 1, "DontKnow",
+                 NA))))))))))))))))))))
+
+race_y$race_youth_sim <- ifelse(race_y$race_youth == "White", "White",
+                  ifelse(race_y$race_youth == "Black", "Black",
+                  ifelse(race_y$race_youth == "Mixed", "Mixed",
+                  ifelse(race_y$race_youth == "Hispanic", "Hispanic",
+                  "Other"))))
+                        
+
+race_y <- race_y %>% select(subjectkey, race_youth, race_youth_sim)
+
+table(race_y$race_youth)
+(round(prop.table(table(race_y$race_youth)), digits = 4))*100
+
+
+  
+```
+
+
+# merge 
+
+```{r}
+demograph <- Reduce(function(...) merge(..., all=T), 
+                    list(siteinfo, race_y, handedness, puberty_p, ses))
+demograph$interview_age <- as.numeric(demograph$interview_age)
+
+# Save and load the data
+saveRDS(demograph, file = "demograph.rds")
+demograph <- readRDS(file = "~/Documents/abcd/demographics/demograph.rds")
+
+
+hist(demograph$interview_age)
+hist(demograph$age_year)
+
+```
+
+# Matched 
+Sex: F, M   
+Age:  9, 10  
+Race: White, Black, Hispanic, Mix, Other  
+Handedness: right, left, both  
+Pubertal status: 5 levels 
+Imaging site: 22 <- do this last
+
+# Family History Positive:  
+Either Parent >= 2 symptoms: FHP 1108 
+546F & 562M
+     
+Excluding TBI Either Parent >= 2 symptoms: FHP 1043   
+518F & 525M
+
+Excluding extreme drug exposure: FHP 605   
+308F & 297M
+
+Excluding drug use: 597
+307F & 290M
+
+Excluding psych (psychosis, bipolar, asd, sud): 379
+215F & 164M 
+
+fhp2.notbi.preg.nodrug.nopsy <- readRDS(file = "~/Documents/abcd/mentalhealth/fhp_thresh2notbipregnodrugnopsy.rds")
+
+```{r}
+fhp2.notbi.preg.nodrug.nopsy <- readRDS(file = "~/Documents/abcd/mentalhealth/fhp_thresh2notbipregnodrugnopsy.rds")
+
+demograph_fhp <- subset(demograph,subjectkey %in% fhp2.notbi.preg.nodrug.nopsy$subjectkey)
+demograph_fhp$group <- "FHP"
+
+#comb <- tidyr::expand(fhp,  tidyr::nesting(sex, age_year, race, handedness, puberty_p))
+
+```
+
+# Family History Negative:  
+Family History Negative: 6752         
+3255F  &  3496M (1 unspecified)  
+    
+Excluding TBI: 6530    
+3158  &  3371 (1 unspecified)  
+
+Excluding drug exposure: 5538  
+2679F  &  2858M (1 unspecified)
+
+Excluding substance use: 5504  
+2665 & 2838 (1 unspecified)
+
+Excluding psych: 3958
+2043 & 1915 
+
+fhn.notbi.noexpose.nodrug.nopsy <- readRDS(file = "~/Documents/abcd/mentalhealth/fhnnotbipregnodrugnopsy.rds")
+
+```{r}
+fhn.notbi.preg.nodrug.nopsy <- readRDS(file = "~/Documents/abcd/mentalhealth/fhnnotbipregnodrugnopsy.rds")
+demograph_fhn <- subset(demograph,subjectkey %in% fhn.notbi.preg.nodrug.nopsy$subjectkey)
+demograph_fhn$group <- "FHN"
+```
+
+http://ugrad.stat.ubc.ca/R/library/e1071/html/matchControls.html
+
+```{r}
+demograph_merge <- merge(demograph_fhp, demograph_fhn, all = T)
+
+demograph_merge$group <- as.factor(demograph_merge$group)
+demograph_merge$sex <- as.factor(demograph_merge$sex)
+demograph_merge$race_youth_sim <- as.factor(demograph_merge$race_youth_sim)
+
+
+match <- e1071::matchControls (demograph_merge$group ~ demograph_merge$handedness 
+                               + demograph_merge$puberty_p + demograph_merge$race_youth_sim 
+                               + demograph_merge$age_year + demograph_merge$sex, 
+                               contlabel = "FHN", caselabel = "FHP")
+
+```
+
+
+```{r}
+match_fhp <- demograph_merge[as.numeric(match[["cases"]]),]
+match_fhn <- demograph_merge[as.numeric(match[["controls"]]),]
+saveRDS(match_fhp, file="~/Documents/abcd/mentalhealth/match_fhp.rds")
+saveRDS(match_fhn, file="~/Documents/abcd/mentalhealth/match_fhn.rds")
+
+match_merge <- merge(match_fhp, match_fhn, all = T)
+saveRDS(match_merge, file="~/Documents/abcd/mentalhealth/match_merge.rds")
+```
+
+
+
+
+
+
+```{r}
+
+table(match_fhp$race_youth_sim)
+table(match_fhn$race_youth_sim)
+
+table(match_fhp$site)
+table(match_fhn$site)
+
+table(match_fhp$combincome_simcat)
+table(match_fhn$combincome_simcat)
+
+table(match_fhp$parent_educomb_simcat)
+table(match_fhn$parent_educomb_simcat)
+```
+
+
+```{r}
+table(match_fhp$sex)
+table(match_fhn$sex)
+
+table(match_fhp$puberty_p)
+table(match_fhn$puberty_p)
+
+table(match_fhp$age_year)
+table(match_fhn$age_year)
+describe(match_fhp$age_year)
+describe(match_fhn$age_year)
+
+table(match_fhp$handednesscat)
+table(match_fhn$handednesscat)
+```
+
+```{r}
+match_fhpsite <- as.data.frame(table(match_fhp$site))
+ggplot(data=match_fhpsite, aes(x= Var1, y = Freq)) +
+  theme_bw() +
+  geom_bar(stat="identity") +
+  ggtitle("FHP") +
+  theme(axis.title.y=element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        axis.title.x = element_text(vjust = 0.5)) +
+  coord_flip()
+
+
+match_fhnsite <- as.data.frame(table(match_fhn$site))
+ggplot(data=match_fhnsite, aes(x= Var1, y = Freq)) +
+  theme_bw() +
+  geom_bar(stat="identity") +
+  ggtitle("FHN") +
+  theme(axis.title.y=element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        axis.title.x = element_text(vjust = 0.5)) +
+  coord_flip()
+```
+
+
+```{r}
+match_fhppub <- cbind(as.data.frame(table(match_fhp$puberty_pcat)), as.data.frame(prop.table(table(match_fhp$puberty_pcat)))) 
+names(match_fhppub)[3:4] <- c("puberty", "prob")
+match_fhppub <- match_fhppub %>% filter(prob != 0)
+
+# Create a basic bar
+ggplot(match_fhppub, aes(x="", y=prob, fill=puberty)) + 
+  geom_bar(stat="identity", width=1) + coord_polar("y", start=0) + 
+  geom_text(aes(label = paste0(round(match_fhppub$prob*100,1), "%")), 
+            position = position_stack(vjust = 0.5)) +
+  labs(x = NULL, y = NULL, fill = NULL, title = "FHP Pubertal Status") +
+  theme_classic() + theme(axis.line = element_blank(),
+          axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          plot.title = element_text(hjust = 0.5, size=20, face="bold"),
+          legend.text=element_text(size=16))
+
+```
+
+```{r}
+match_fhnpub <- cbind(as.data.frame(table(match_fhn$puberty_pcat)), as.data.frame(prop.table(table(match_fhn$puberty_pcat)))) 
+names(match_fhnpub)[3:4] <- c("puberty", "prob")
+match_fhnpub <- match_fhnpub %>% filter(prob != 0)
+
+# Create a basic bar
+ggplot(match_fhnpub, aes(x="", y=prob, fill=puberty)) + 
+  geom_bar(stat="identity", width=1) + coord_polar("y", start=0) + 
+  geom_text(aes(label = paste0(round(match_fhnpub$prob*100,1), "%")), 
+            position = position_stack(vjust = 0.5)) +
+  labs(x = NULL, y = NULL, fill = NULL, title = "FHN Pubertal Status") +
+  theme_classic() + theme(axis.line = element_blank(),
+          axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          plot.title = element_text(hjust = 0.5, size=20, face="bold"),
+          legend.text=element_text(size=16))
+```
+
+
+```{r}
+match_fhprace <- cbind(as.data.frame(table(match_fhp$race_youth_sim)), as.data.frame(prop.table(table(match_fhp$race_youth_sim)))) 
+names(match_fhprace)[3:4] <- c("puberty", "prob")
+match_fhprace <- match_fhprace %>% filter(prob != 0)
+
+# Create a basic bar
+ggplot(match_fhprace, aes(x="", y=prob, fill=puberty)) + 
+  geom_bar(stat="identity", width=1) + coord_polar("y", start=0) + 
+  geom_text(aes(label = paste0(round(match_fhprace$prob*100,1), "%")), 
+            position = position_stack(vjust = 0.5)) +
+  labs(x = NULL, y = NULL, fill = NULL, title = "FHP Ethnicity") +
+  theme_classic() + theme(axis.line = element_blank(),
+          axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          plot.title = element_text(hjust = 0.5, size=20, face="bold"),
+          legend.text=element_text(size=16))
+```
+
+```{r}
+match_fhnrace <- cbind(as.data.frame(table(match_fhn$race_youth_sim)), as.data.frame(prop.table(table(match_fhn$race_youth_sim)))) 
+names(match_fhnrace)[3:4] <- c("puberty", "prob")
+match_fhnrace <- match_fhnrace %>% filter(prob != 0)
+
+# Create a basic bar
+ggplot(match_fhnrace, aes(x="", y=prob, fill=puberty)) + 
+  geom_bar(stat="identity", width=1) + coord_polar("y", start=0) + 
+  geom_text(aes(label = paste0(round(match_fhnrace$prob*100,1), "%")), 
+            position = position_stack(vjust = 0.5)) +
+  labs(x = NULL, y = NULL, fill = NULL, title = "FHN Ethnicity") +
+  theme_classic() + theme(axis.line = element_blank(),
+          axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          plot.title = element_text(hjust = 0.5, size=20, face="bold"),
+          legend.text=element_text(size=16))
+```
+
+
+```{r}
+library(ggpubr)
+ggplot(match_merge, aes(group,parent_educomb)) +
+  theme_bw() +
+  geom_violin() +
+  geom_boxplot(aes(col=group), lwd=1, position=position_dodge(3), 
+              width=0.3) + 
+  #ggtitle("Right Ventral Striatum") +
+  ylab("Parent Education") +
+  theme(plot.title = element_text(size=16, face="bold", hjust = 0.5)) +
+  theme(axis.title.x=element_blank(),
+        axis.ticks.x=element_blank()
+  ) +
+  theme(legend.position = "none") +
+  geom_jitter(aes(group,parent_educomb), size=2, shape=16, 
+              position=position_jitter(width = 0.1, height = 0)) +
+  theme(axis.text.x = element_text(size=14,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
+        axis.text.y = element_text(size=13,face="plain")) +
+  stat_summary(fun.y=mean, colour="red", geom="point", size=4) +
+  stat_compare_means(method = "t.test", label.x = 1.4)
+```
+
+```{r}
+library(ggstatsplot)
+
+(data = match_merge, x = group, y = parent_educomb, plot.type = "boxviolin", 
+               type = "p", effsize.type = "d", conf.level = 0.95, package = "ggsci", 
+               palette = "nrc_npg", k = 2, messages = FALSE, bf.message = F) +
+  ylab("Parental Education")
+```
+
+
+
+```{r}
+ggplot(match_merge, aes(group,combincome)) +
+  theme_bw() +
+  geom_violin() +
+  geom_boxplot(aes(col=group), lwd=1, position=position_dodge(3), 
+              width=0.3) + 
+  #ggtitle("Right Ventral Striatum") +
+  ylab("Combined Income") +
+  theme(plot.title = element_text(size=16, face="bold", hjust = 0.5)) +
+  theme(axis.title.x=element_blank(),
+        axis.ticks.x=element_blank()
+  ) +
+  theme(legend.position = "none") +
+  geom_jitter(aes(group,combincome), size=2, shape=16, 
+              position=position_jitter(width = 0.1, height = 0)) +
+  theme(axis.text.x = element_text(size=14,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
+        axis.text.y = element_text(size=13,face="plain")) +
+  stat_summary(fun.y=mean, colour="red", geom="point", size=4) +
+  stat_compare_means(method = "t.test", label.x = 1.4)
+```
+
+```{r}
+ggbetweenstats(data = match_merge, x = group, y = combincome, plot.type = "boxviolin", 
+               type = "p", effsize.type = "d", conf.level = 0.95, package = "ggsci", 
+               palette = "nrc_npg", k = 2, messages = FALSE, bf.message = F) +
+  ylab("Combined Income")
+```
+
+```{r}
+edutable <- table(match_merge$group, match_merge$parent_educomb_simcat)
+barplot(edutable, legend = T, beside = T)
+educhi <- chisq.test(edutable, correct=T)
+```
+
+
+```{r}
+incometable <- table(match_merge$group, match_merge$combincome_simcat)
+barplot(incometable, legend = T, beside = T)
+incomechi <- chisq.test(incometable, correct=T)
+```
+
+```{r}
+match_fhp <- readRDS(file="~/Documents/abcd/mentalhealth/match_fhp.rds")
+match_fhn <- readRDS(file="~/Documents/abcd/mentalhealth/match_fhn.rds")
+match_merge <- readRDS(file="~/Documents/abcd/mentalhealth/match_merge.rds")
+```
+
+```{r}
+library(ggstatsplot)
+library(ggplot2)
+ggbarstats(data = match_merge, x = group, y = parent_educomb_simcat, 
+           sampling.plan = "jointMulti", title = "Parental Highest Education", 
+           perc.k = 2, palette = "Set2", messages = FALSE,bf.message = F, label.text.size = 5) +
+  theme(axis.title.x=element_blank()) +
+  scale_x_discrete("Cut", labels = c("< HS Diploma" = "< HS","HS Diploma/GED" = "HS/GED",
+  "Some College" = "Some College","Bachelor" = "Bachelor","Post Graduate Degree" = "Higher Edu"))
+  
+```
+
+```{r}
+ggbarstats(
+  data = match_merge,
+  x = group,
+  y = combincome_simcat,
+  sampling.plan = "jointMulti",
+  title = "Parental Combined Income",
+  perc.k = 2,
+  palette = "Set2",
+  messages = FALSE, bf.message = F) +
+  theme(axis.title.x=element_blank())
+```
+
+
+
+```{r}
+match_fhp <- readRDS(file="~/Documents/abcd/mentalhealth/match_fhp.rds")
+match_fhn <- readRDS(file="~/Documents/abcd/mentalhealth/match_fhn.rds")
+```

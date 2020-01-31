@@ -1,0 +1,655 @@
+---
+title: "ABCD Neuropsych Exploratory Factor Analysis"
+output:
+  html_notebook: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+  word_document: default
+---
+
+In exploratory factor analysis (EFA), each observed variable is potentially a measure of every factor, and the goal is to determine relationships (between observed variables and factors) are strongest. In confirmatory factor analysis (CFA), a simple factor structure is posited, each variable can be a measure of only one factor, and the correlation structure of the data is tested against the hypothesized structure via goodness of fit tests. 
+
+Initial N = 11875    
+  
+N NIH = 11873   
+N RAVLT = 11871   
+N Matrix = 11871   
+N LMT = 11873   
+N normal vision = 11844   
+  
+N normal vision NIH = 11842   
+N normal vision RAVLT = 11840   
+N normal vision Matrix = 11840   
+N normal vision LMT = 11842   
+
+rm(list=ls())
+
+```{r}
+
+setwd("~/Documents/abcd/neuropsych/")
+library(dplyr)
+library(psych)
+```
+
+```{r}
+neuropsy <- readRDS(file = "~/Documents/abcd/neuropsych/neuropsy.rds") 
+neuropsyfa.input <- neuropsy[, -grep("uncorrected", colnames(neuropsy))]
+neuropsyfa.input <- neuropsyfa.input[, -grep("_fc", colnames(neuropsyfa.input))]
+
+neuropsyfa.input <- neuropsyfa.input %>%
+  select(-nihtbx_fluidcomp_agecorrected,-nihtbx_totalcomp_agecorrected, 
+         -nihtbx_cryst_agecorrected) %>% 
+  rename(tb_picvocab = nihtbx_picvocab_agecorrected,
+         tb_flanker = nihtbx_flanker_agecorrected,
+         tb_listsortwm = nihtbx_list_agecorrected,
+         tb_cardsort = nihtbx_cardsort_agecorrected,
+         tb_pattern =  nihtbx_pattern_agecorrected,
+         tb_pictureseq = nihtbx_picture_agecorrected,
+         tb_reading = nihtbx_reading_agecorrected,
+         ravlt_sd = pea_ravlt_sd_trial_vi_tc,
+         ravlt_ld = pea_ravlt_ld_trial_vii_tc,
+         wiscv_matrix = pea_wiscv_tss,
+         lmt_efficiency = efficiency)
+```
+
+# Correlation of Neuropsych measures
+
+```{r}
+pairs.panels(neuropsyfa.input[-1])
+```
+
+```{r}
+lowerCor(neuropsyfa.input[-1])
+```
+
+
+```{r}
+corPlot(neuropsyfa.input[-1], numbers = T, scale = T, stars = T, diag = F, cex=.8)
+```
+
+```{r}
+correlmatrix <- cor(neuropsyfa.input[-1], use = "complete.obs")
+```
+
+
+# Determining the number of factors
+
+## Parallel analysis and Scree plot
+
+The scree plot is so-named because of the scree test proposed by Cattell (1966), who suggested you could look at where the “scree”–a term for rubble at the base of a hill–begins, in order to determine how many factors are necessary to retain.   
+  
+Parallel analysis (introduced by Horn, 1965) is a technique designed to help take some of the subjectivity out of interpreting the scree plot. It is a simulation-based method, and the logic is pretty straightforward:  
+  
+Simulate a random data set (or sets) with the same number of items that have the same possible range of observed values. In essence, this data is junk/garbage/noise, in the same number of variables and on the same scale as your EFA.  
+Extract eigenvalues from the junk data set(s)  
+Plot the eigenvalues from the junk data alongside your observed eigenvalues on the same scree plot  
+Retain, at maximum, the number of factors with observed eigenvalues that are larger than those extracted from corresponding factors based on junk/garbage/noise data.  
+
+Next, we use the package’s fa.parallel function to run parallel analysis. Then, in order, we: (1) specify our data frame; (2) indicate that we want to estimate eigenvalues using minimum residual; (3) indicate that we only want the CF eigenvalues (and not the component eigenvalues) reported; (4) indicate that we  50 random datasets simulated for our parallel analysis; (5) indicate that we want to use squared multiple correlations (SMCs) as the starting communality estimates for our factor analysis (a common default with CF methods); and finally (6) specify that we would like the 95th quantile of simulated eigenvalues to be used as the point of comparison when deciding whether our observed eigenvalues are explaining more variance.
+
+
+```{r}
+parallel = fa.parallel(neuropsyfa.input[-1], fm = 'minres', fa = 'fa', n.iter = 1000, SMC = TRUE, quant = .95)
+```
+
+The eigenvalue represents the amount of variance each factor accounts for. Each extracted factor will have an eigenvalue (the integer multiple of the original vector). Eigenvalues are also the sum of squared component loadings across all items for each component, which represent the amount of variance in each item that can be explained by the principal component. Eigenvectors represent a weight for each eigenvalue. The eigenvector times the square root of the eigenvalue gives the component loadings which can be interpreted as the correlation of each item with the principal component.  
+  
+The blue line shows eigenvalues of actual data and the two red lines (placed on top of each other) show simulated and resampled data. Here we look at the large drops in the actual data and spot the point where it levels off to the right. Also we locate the point of inflection – the point where the gap between simulated data and actual data tends to be minimum.  
+  
+# Very Simple Structure
+(Revelle & Rocklin, 1979) 
+
+```{r}
+vss(correlmatrix, rotate="oblimin", fm = "minres", plot=T)  
+```
+
+
+Complexity is the number of factors that each variable loads on. Choose the
+number of factors based on the maximum value of the VSS. This also included Velicer’s MAP function, which should be
+minimized.
+
+# Factor Analysis
+
+## Test for 7 tasks of the NIH Toolbox
+
+If do this just on 7 TB tasks -> 3 factors: verbal IQ (picvocab + reading), memory (listssortwm + pictureseq episodic memory) and flexibility/executive function (flanker, card sort, pattern comparison)
+
+```{r}
+nih <- fa(neuropsyfa.input[,2:8], nfactors = 3, rotate = "oblimin", fm="minres")
+nih
+```
+
+
+Notes on rotation: Factor are rotated (literally, in geometric space) in order to aid in interpretation. There are two type of rotation: orthogonal (perpendicular), in which factors are not permitted to be correlated with each other, and oblique, in which factors are free to take any position the factor space and can be correlated with each other. Examples of orthogonal rotation include varimax, quartimax, and equamax. Examples of oblique rotation include oblimin, promax, and geomin. 
+ 
+# Loadings  
+Factor loadings are a matrix of how observed variables are related to the factors you’ve specified. In geometric terms, loadings are the numerical coefficients corresponding to the directional paths connecting common factors to observed variables. They provide the basis for interpreting the latent variables. Higher loadings mean that the observed variable is more strongly related to the factor. A rule of thumb is to consider loadings above 0.3.
+  
+Tabachnick and Fidell (2007) provided a rule of thumb that for a sample size of 300, a statistically meaningful factor loading would need to be above .32. Peterson (2000) conducted a meta-analysis and found that the most common cutoff value is .40; it is not only the value that one-third of the studies used but also the average cutoff value.
+
+```{r}
+print(nih$loadings,cutoff = 0.3)
+```
+
+The loadings (range -1 to 1) are the regression coefficients of the latent factors on the observed variables. 
+
+“Uniquenesses” ranges from 0 to 1. What we’re looking for are high numbers. A high uniqueness for a variable usually means it doesn’t fit neatly into our factors. The 1500 meter run, for example, has a uniqueness of about 0.77. It doesn’t seem to fall into either of our three factors, whatever they may represent. If we subtract the uniquenesses from 1, we get a quantity called the communality. The communality is the proportion of variance of the ith variable contributed by the m common factors. Here m = 3. Subtracting 0.77 from 1 gives us 0.23, which says about 23% of the 1500 meter variance was contributed by the 3 common factors. In general, we’d like to see low uniquenesses or high communalities, depending on what your statistical program returns.
+
+SS loadings is the sum squared loadings related to each factor. It is the overall variance explained in all the variables by each factor. Proportion Var is the variances in the observed variables/indicators explained by each factor. Cumulative Var is the cumulative proportion of variance explained by all factors.
+
+
+```{r}
+fa.diagram(nih)
+```
+
+
+# Full neuropsych 
+
+## Kaiser-Meyer-Olin test of "sampling adequacy" 
+Some say don’t extract factors if this is below .50. The higher the better.
+
+```{r}
+KMO(neuropsyfa.input[-1])
+```
+
+## 4 factors
+
+```{r}
+neuropsy <- readRDS(file = "~/Documents/abcd/neuropsych/neuropsy.rds") 
+neuropsyfa.input <- neuropsy[, -grep("uncorrected", colnames(neuropsy))]
+neuropsyfa.input <- neuropsyfa.input[, -grep("_fc", colnames(neuropsyfa.input))]
+
+neuropsyfa.input <- neuropsyfa.input %>%
+  select(-nihtbx_fluidcomp_agecorrected,-nihtbx_totalcomp_agecorrected, 
+         -nihtbx_cryst_agecorrected) %>% 
+  rename(tb_picvocab = nihtbx_picvocab_agecorrected,
+         tb_flanker = nihtbx_flanker_agecorrected,
+         tb_listsortwm = nihtbx_list_agecorrected,
+         tb_cardsort = nihtbx_cardsort_agecorrected,
+         tb_pattern =  nihtbx_pattern_agecorrected,
+         tb_pictureseq = nihtbx_picture_agecorrected,
+         tb_reading = nihtbx_reading_agecorrected,
+         ravlt_sd = pea_ravlt_sd_trial_vi_tc,
+         ravlt_ld = pea_ravlt_ld_trial_vii_tc,
+         wiscv_matrix = pea_wiscv_tss,
+         lmt_efficiency = efficiency)
+
+neuropsyfa.output <- fa(neuropsyfa.input[-1], nfactors = 4, rotate = "oblimin", fm="minres")
+saveRDS(neuropsyfa.output, file = "~/Documents/abcd/neuropsych/neuropsyfaout.rds")
+neuropsyfa.output
+```
+
+Tucker Lewis Index of factoring reliability should > .9    
+RMSEA (root mean square error of approximation) index (goodness of fit) has to be below 0.05
+
+```{r}
+print(neuropsyfa.output$loadings,cutoff = 0.3)
+```
+
+```{r}
+fa.diagram(neuropsyfa.output)
+```
+
+auditory learning and memory: short + long delay
+processing speed/executive function: pattern comparison (processing speed) + card sort (flexibility, set shifting, executive) + flanker (executive, inhibition) + little man task (mental rotation)
+verbal IQ: reading + pic vocab
+memory: list sort (working memory) + matrix reasoning (visuospatial processing, should have been with executive factor) + picture sequence (episodic memory)
+
+
+## 3 factors
+
+```{r}
+neuropsyfa3.output <- fa(neuropsyfa.input[-1], nfactors = 3, rotate = "oblimin", fm="minres")
+fa.diagram(neuropsyfa3.output)
+```
+
+## 2 factors
+
+```{r}
+neuropsyfa2.output <- fa(neuropsyfa.input[-1], nfactors = 2, rotate = "oblimin", fm="minres")
+fa.diagram(neuropsyfa2.output)
+```
+
+
+5.2 Confidence intervals using bootstrapping techniques
+Exploratory factoring techniques are sometimes criticized because of the lack of statistical
+information on the solutions. Overall estimates of goodness of fit including χ2 and RMSEA
+are found in the fa and omega functions. Confidence intervals for the factor loadings may
+be found by doing multiple bootstrapped iterations of the original analysis. This is done
+by setting the n.iter parameter to the desired number of iterations. This can be done for
+factoring of Pearson correlation matrices as well as polychoric/tetrachoric matrices (See
+Table 8). Although the example value for the number of iterations is set to 20, more
+conventional analyses might use 1000 bootstraps. This will take much longer.
+
+```{r}
+neuropsyfaboot <- fa(neuropsyfa.input[-1],nfactors = 4, rotate = "oblimin", fm="minres", 
+                     n.iter = 1000)
+neuropsyfaboot
+```
+
+```{r}
+neuropsyfa.output <- readRDS(file = "~/Documents/abcd/neuropsych/neuropsyfaout.rds")
+scores <- as.data.frame(neuropsyfa.output$scores)
+scores$subjectkey <- neuropsyfa.input$subjectkey
+names(scores) <- c("RAVLT", "ExecutiveFunction", "VerbalIQ", "Memory", "subjectkey")
+
+cbclneuropsy <- merge(scores, cbcl, all = T) %>%
+  select(subjectkey, RAVLT, ExecutiveFunction, VerbalIQ, Memory, cbcl_scr_syn_internal_t,
+         cbcl_scr_syn_external_t, cbcl_scr_syn_totprob_t)
+
+names(cbclneuropsy)[c(6:8)] <- c("cbcl_internal_t", "cbcl_external_t", "cbcl_total_t")
+corPlot(cbclneuropsy[-1], numbers = T, scale = T, stars = T, diag = F, cex=.8, upper = F)
+```
+
+
+```{r}
+match_fhp <- readRDS(file="~/Documents/abcd/mentalhealth/match_fhp.rds")
+match_fhn <- readRDS(file="~/Documents/abcd/mentalhealth/match_fhn.rds")
+
+neuropsyscores_fhp <- subset(scores, subjectkey %in% match_fhp$subjectkey)
+neuropsyscores_fhp$group <- "FHP"
+neuropsyscores_fhn <- subset(scores, subjectkey %in% match_fhn$subjectkey)
+neuropsyscores_fhn$group <- "FHN"
+
+neuropsyscores_merge <- merge(neuropsyscores_fhp, neuropsyscores_fhn, all = T)
+neuropsyscores_merge$group <- factor(neuropsyscores_merge$group) 
+```
+
+```{r}
+neuropsyscorescbcl_merge <- merge(neuropsyscores_merge, cbcl_merge, all = T)
+
+names(neuropsyscorescbcl_merge)[c(48,52,56)] <- c("cbcl_internal_t", "cbcl_external_t", "cbcl_total_t")
+
+corPlot(neuropsyscorescbcl_merge[c(3:6,48, 52, 56)], numbers = T, scale = T, stars = T, diag = F, cex=.8, upper = F)
+```
+
+```{r}
+t.test(neuropsyscores_fhp[1], neuropsyscores_fhn[1])
+t.test(neuropsyscores_fhp[2], neuropsyscores_fhn[2])
+t.test(neuropsyscores_fhp[3], neuropsyscores_fhn[3])
+t.test(neuropsyscores_fhp[4], neuropsyscores_fhn[4])
+```
+
+```{r}
+ggplot(neuropsyscores_merge, aes(group,RAVLT)) +
+  theme_bw() +
+  geom_violin() +
+  geom_boxplot(aes(col=group), lwd=1, position=position_dodge(3), 
+              width=0.3, outlier.shape=NA) + 
+  #ggtitle("Fluid Intelligence") +
+  ylab("Rey Auditory Verbal Learning Test") +
+  theme(plot.title = element_text(size=16, face="bold", hjust = 0.5)) +
+  theme(axis.title.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  theme(legend.position = "none") +
+  geom_jitter(aes(group,RAVLT), size=2, shape=16, 
+              position=position_jitter(width = 0.1, height = 0)) +
+  theme(axis.text.x = element_text(size=14,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
+        axis.text.y = element_text(size=13,face="plain")) +
+  stat_summary(fun.y=mean, colour="red", geom="point", size=4) +
+  stat_compare_means(method = "t.test", label.x = 1.4)
+```
+
+```{r}
+ggbetweenstats(data = neuropsyscores_merge, x = group, y = RAVLT, plot.type = "boxviolin", 
+               type = "p", effsize.type = "d", conf.level = 0.95, package = "ggsci", 
+               palette = "nrc_npg", k = 2, messages = FALSE, bf.message = F) +
+  ylab("RAVLT")
+```
+
+
+
+```{r}
+ggplot(neuropsyscores_merge, aes(group,ExecutiveFunction)) +
+  theme_bw() +
+  geom_violin() +
+  geom_boxplot(aes(col=group), lwd=1, position=position_dodge(3), 
+              width=0.3, outlier.shape=NA) + 
+  #ggtitle("Fluid Intelligence") +
+  ylab("Executive Function") +
+  theme(plot.title = element_text(size=16, face="bold", hjust = 0.5)) +
+  theme(axis.title.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  theme(legend.position = "none") +
+  geom_jitter(aes(group,ExecutiveFunction), size=2, shape=16, 
+              position=position_jitter(width = 0.1, height = 0)) +
+  theme(axis.text.x = element_text(size=14,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
+        axis.text.y = element_text(size=13,face="plain")) +
+  stat_summary(fun.y=mean, colour="red", geom="point", size=4) +
+  stat_compare_means(method = "t.test", label.x = 1.4)
+```
+
+```{r}
+ggbetweenstats(data = neuropsyscores_merge, x = group, y = ExecutiveFunction, 
+               plot.type = "boxviolin", 
+               type = "p", effsize.type = "d", conf.level = 0.95, package = "ggsci", 
+               palette = "nrc_npg", k = 2, messages = FALSE, bf.message = F) +
+  ylab("Executive Function")
+```
+
+
+```{r}
+ggplot(neuropsyscores_merge, aes(group,VerbalIQ)) +
+  theme_bw() +
+  geom_violin() +
+  geom_boxplot(aes(col=group), lwd=1, position=position_dodge(3), 
+              width=0.3, outlier.shape=NA) + 
+  #ggtitle("Fluid Intelligence") +
+  ylab("Verbal IQ") +
+  theme(plot.title = element_text(size=16, face="bold", hjust = 0.5)) +
+  theme(axis.title.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  theme(legend.position = "none") +
+  geom_jitter(aes(group,VerbalIQ), size=2, shape=16, 
+              position=position_jitter(width = 0.1, height = 0)) +
+  theme(axis.text.x = element_text(size=14,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
+        axis.text.y = element_text(size=13,face="plain")) +
+  stat_summary(fun.y=mean, colour="red", geom="point", size=4) +
+  stat_compare_means(method = "t.test", label.x = 1.4)
+```
+
+```{r}
+ggbetweenstats(data = neuropsyscores_merge, x = group, y = VerbalIQ, 
+               plot.type = "boxviolin", 
+               type = "p", effsize.type = "d", conf.level = 0.95, package = "ggsci", 
+               palette = "nrc_npg", k = 2, messages = FALSE, bf.message = F) +
+  ylab("Verbal IQ")
+```
+
+
+```{r}
+ggplot(neuropsyscores_merge, aes(group,Memory)) +
+  theme_bw() +
+  geom_violin() +
+  geom_boxplot(aes(col=group), lwd=1, position=position_dodge(3), 
+              width=0.3, outlier.shape=NA) + 
+  #ggtitle("Fluid Intelligence") +
+  ylab("Memory/Sequencing") +
+  theme(plot.title = element_text(size=16, face="bold", hjust = 0.5)) +
+  theme(axis.title.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  theme(legend.position = "none") +
+  geom_jitter(aes(group,Memory), size=2, shape=16, 
+              position=position_jitter(width = 0.1, height = 0)) +
+  theme(axis.text.x = element_text(size=14,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
+        axis.text.y = element_text(size=13,face="plain")) +
+  stat_summary(fun.y=mean, colour="red", geom="point", size=4) +
+  stat_compare_means(method = "t.test", label.x = 1.4)
+```
+
+```{r}
+ggbetweenstats(data = neuropsyscores_merge, x = group, y = Memory, 
+               plot.type = "boxviolin", 
+               type = "p", effsize.type = "d", conf.level = 0.95, package = "ggsci", 
+               palette = "nrc_npg", k = 2, messages = FALSE, bf.message = F) +
+  ylab("Memory/Sequencing")
+```
+
+
+tutorials on logistic regression here: https://stats.idre.ucla.edu/r/dae/logit-regression/
+
+```{r}
+neuropsyscoresdemo_fhp <- Reduce(function(...) merge(..., all=T), 
+                                 list(neuropsyscores_fhp, match_fhp))
+neuropsyscoresdemo_fhn <- Reduce(function(...) merge(..., all=T), 
+                                 list(neuropsyscores_fhn, match_fhn))
+
+neuropsyscoresdemo_merge <- merge(neuropsyscoresdemo_fhp, neuropsyscoresdemo_fhn, all = T)
+neuropsyscoresdemo_merge$group <- factor(neuropsyscoresdemo_merge$group) 
+```
+
+
+```{r}
+RAVLT <- glm(group ~ RAVLT + combincome_simcat + parent_educomb_simcat, data = neuropsyscoresdemo_merge, family = "binomial")
+summary (RAVLT)
+```
+
+```{r}
+exe <- glm(group ~ ExecutiveFunction + combincome_simcat + parent_educomb_simcat, data = neuropsyscoresdemo_merge, family = "binomial")
+summary (exe)
+```
+
+```{r}
+VerbalIQ <- glm(group ~ VerbalIQ + combincome_simcat + parent_educomb_simcat, data = neuropsyscoresdemo_merge, family = "binomial")
+summary (VerbalIQ)
+```
+
+```{r}
+Memory <- glm(group ~ Memory + combincome_simcat + parent_educomb_simcat, data = neuropsyscoresdemo_merge, family = "binomial")
+summary (Memory)
+```
+
+
+```{r}
+neuropsy <- readRDS(file = "~/Documents/abcd/neuropsych/neuropsy.rds")
+
+neuropsy_fhp <- subset(neuropsy, subjectkey %in% match_fhp$subjectkey)
+neuropsy_fhp$group <- "FHP"
+neuropsy_fhn <- subset(neuropsy, subjectkey %in% match_fhn$subjectkey)
+neuropsy_fhn$group <- "FHN"
+
+neuropsy_merge <- merge(neuropsy_fhp, neuropsy_fhn, all = T)
+```
+
+
+```{r}
+ggplot(neuropsy_merge, aes(group,efficiency)) +
+  theme_bw() +
+  geom_violin() +
+  geom_boxplot(aes(col=group), lwd=1, position=position_dodge(3), 
+              width=0.3, outlier.shape=NA) + 
+  #ggtitle("Fluid Intelligence") +
+  ylab("The Little Man Task Efficiency") +
+  theme(plot.title = element_text(size=16, face="bold", hjust = 0.5)) +
+  theme(axis.title.x=element_blank(),
+        axis.ticks.x=element_blank()
+  ) +
+  theme(legend.position = "none") +
+  geom_jitter(aes(group,efficiency), size=2, shape=16, 
+              position=position_jitter(width = 0.1, height = 0)) +
+  theme(axis.text.x = element_text(size=14,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
+        axis.text.y = element_text(size=13,face="plain")) +
+  stat_summary(fun.y=mean, colour="red", geom="point", size=4) +
+  stat_compare_means(method = "t.test", label.x = 1.4)
+```
+
+```{r}
+ggbetweenstats(data = neuropsy_merge, x = group, y = efficiency, plot.type = "boxviolin", 
+               type = "p", effsize.type = "d", conf.level = 0.95, package = "ggsci", 
+               palette = "nrc_npg", k = 2, messages = FALSE, bf.message = F) +
+  ylab("The Little Man Task Efficiency")
+```
+
+```{r}
+neuropsydemo_merge <- merge(neuropsy_merge, match_merge, all = T)
+neuropsydemo_merge$group <- as.factor(neuropsydemo_merge$group)
+lmtefficiency <- glm(group ~ efficiency + combincome_simcat + parent_educomb_simcat, data = neuropsydemo_merge, family = "binomial")
+summary (lmtefficiency)
+```
+
+```{r}
+ggplot(neuropsy_merge, aes(group,nihtbx_fluidcomp_agecorrected)) +
+  theme_bw() +
+  geom_violin() +
+  geom_boxplot(aes(col=group), lwd=1, position=position_dodge(3), 
+              width=0.3, outlier.shape=NA) + 
+  #ggtitle("Fluid Intelligence") +
+  ylab("Fluid Intelligence") +
+  theme(plot.title = element_text(size=16, face="bold", hjust = 0.5)) +
+  theme(axis.title.x=element_blank(),
+        axis.ticks.x=element_blank()
+  ) +
+  theme(legend.position = "none") +
+  geom_jitter(aes(group,nihtbx_fluidcomp_agecorrected), size=2, shape=16, 
+              position=position_jitter(width = 0.1, height = 0)) +
+  theme(axis.text.x = element_text(size=14,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
+        axis.text.y = element_text(size=13,face="plain")) +
+  stat_summary(fun.y=mean, colour="red", geom="point", size=4) +
+  stat_compare_means(method = "t.test", label.x = 1.4)
+```
+
+```{r}
+ggbetweenstats(data = neuropsy_merge, x = group, y = nihtbx_fluidcomp_agecorrected, 
+               plot.type = "boxviolin", 
+               type = "p", effsize.type = "d", conf.level = 0.95, package = "ggsci", 
+               palette = "nrc_npg", k = 2, messages = FALSE, bf.message = F) +
+  ylab("Fluid Intelligence")
+```
+
+
+```{r}
+ggplot(neuropsy_merge, aes(group,nihtbx_cryst_agecorrected)) +
+  theme_bw() +
+  geom_violin() +
+  geom_boxplot(aes(col=group), lwd=1, position=position_dodge(3), 
+              width=0.3, outlier.shape=NA) + 
+  #ggtitle("Fluid Intelligence") +
+  ylab("Crystalized Intelligence") +
+  theme(plot.title = element_text(size=16, face="bold", hjust = 0.5)) +
+  theme(axis.title.x=element_blank(),
+        axis.ticks.x=element_blank()
+  ) +
+  theme(legend.position = "none") +
+  geom_jitter(aes(group,nihtbx_cryst_agecorrected), size=2, shape=16, 
+              position=position_jitter(width = 0.1, height = 0)) +
+  theme(axis.text.x = element_text(size=14,face="bold"),
+        axis.title.y = element_text(size=15,face="bold"),
+        axis.text.y = element_text(size=13,face="plain")) +
+  stat_summary(fun.y=mean, colour="red", geom="point", size=4) +
+  stat_compare_means(method = "t.test", label.x = 1.4)
+```
+
+```{r}
+ggbetweenstats(data = neuropsy_merge, x = group, y = nihtbx_cryst_agecorrected, 
+               plot.type = "boxviolin", 
+               type = "p", effsize.type = "d", conf.level = 0.95, package = "ggsci", 
+               palette = "nrc_npg", k = 2, messages = FALSE, bf.message = F) +
+  ylab("Crystalized Intelligence")
+```
+
+
+
+```{r}
+for (i in c(2:35)) {
+  print(names(neuropsy_fhp[i]))
+  print(t.test(neuropsy_fhp[,i], neuropsy_fhn[,i]))
+}
+```
+
+
+```{r}
+neuropsydemo_fhp <- Reduce(function(...) merge(..., all=T), list(neuropsy_fhp, match_fhp))
+neuropsydemo_fhn <- Reduce(function(...) merge(..., all=T), list(neuropsy_fhn, match_fhn))
+
+neuropsydemo_merge <- rbind(neuropsydemo_fhp, neuropsydemo_fhn)
+neuropsydemo_merge$group <- factor(neuropsydemo_merge$group) 
+```
+
+```{r}
+lmt <- glm(group ~ efficiency + combincome_simcat + parent_educomb_simcat, data = neuropsydemo_merge, family = "binomial")
+summary(lmt)
+```
+
+```{r}
+fluid <- glm(group ~ nihtbx_fluidcomp_uncorrected + combincome_simcat + parent_educomb_simcat, data = neuropsydemo_merge, family = "binomial")
+summary (fluid)
+```
+
+```{r}
+crystal <- glm(group ~ nihtbx_cryst_agecorrected + combincome_simcat + parent_educomb_simcat, data = neuropsydemo_merge, family = "binomial")
+summary (crystal)
+```
+
+
+
+
+```{r}
+model5 <- glm(group ~ nihtbx_picvocab_agecorrected + nihtbx_flanker_agecorrected +  nihtbx_list_agecorrected + nihtbx_cardsort_agecorrected + nihtbx_pattern_agecorrected + nihtbx_picture_agecorrected + nihtbx_reading_agecorrected + pea_ravlt_sd_trial_vi_tc +     
++ pea_ravlt_ld_trial_vii_tc + pea_wiscv_tss + efficiency, data = neuropsy_merge, family = "binomial")
+summary (model5)
+```
+
+
+
+```{r}
+model6 <- glm(group ~ nihtbx_picvocab_uncorrected + nihtbx_flanker_uncorrected +  nihtbx_list_uncorrected + nihtbx_cardsort_uncorrected + nihtbx_pattern_uncorrected + nihtbx_picture_uncorrected + nihtbx_reading_uncorrected + pea_ravlt_sd_trial_vi_tc +     
++ pea_ravlt_ld_trial_vii_tc + pea_wiscv_tss + efficiency, data = neuropsy_merge, family = "binomial")
+summary (model6)
+```
+
+```{r}
+model7 <- glm(group ~ nihtbx_picvocab_fc + nihtbx_flanker_fc +  nihtbx_list_fc + nihtbx_cardsort_fc + nihtbx_pattern_fc + nihtbx_picture_fc + nihtbx_reading_fc + pea_ravlt_sd_trial_vi_tc +     
++ pea_ravlt_ld_trial_vii_tc + pea_wiscv_tss + efficiency, data = neuropsy_merge, family = "binomial")
+summary (model7)
+```
+
+```{r}
+model8 <- glm(group ~ nihtbx_picvocab_agecorrected + nihtbx_flanker_agecorrected +  nihtbx_list_agecorrected + nihtbx_cardsort_agecorrected + nihtbx_pattern_agecorrected + nihtbx_picture_agecorrected + nihtbx_reading_agecorrected + pea_ravlt_sd_trial_vi_tc +     
++ pea_ravlt_ld_trial_vii_tc + pea_wiscv_tss + efficiency + combincome + eduparent, data = neuropsydemo_merge, family = "binomial")
+summary (model8)
+```
+
+
+# Notes on extraction method
+
+https://cran.r-project.org/web/packages/psych/psych.pdf
+Among the many ways to do latent variable exploratory factor analysis (EFA), one of the better is to use Ordinary Least Squares (OLS) to find the minimum residual (minres) solution. This produces solutions very similar to maximum likelihood even for badly behaved matrices. A variation on minres is to do weighted least squares (WLS). Perhaps the most conventional technique is principal axes (PAF). An eigen value decomposition of a correlation matrix is done and then the communalities for each variable are estimated by the first n factors. These communalities are entered onto the diagonal and the procedure is repeated until the sum(diag(r)) does not vary. Yet another estimate procedure is maximum likelihood. For well behaved matrices, maximum likelihood factor analysis (either in the fa or in the factanal function) is probably preferred. Bootstrapped confidence intervals of the loadings and interfactor correlations are found by fa with n.iter > 1.
+
+# other things from the package manual
+
+Factor analysis is an attempt to approximate a correlation or covariance matrix with one of lesser rank. The existence of uniquenesses is what distinguishes factor analysis from
+principal components analysis (e.g., principal). If variables are thought to represent a “true" or latent part then factor analysis provides an estimate of the correlations with the latent factor(s) representing the data. If variables are thought to be measured without error, then principal components provides the most parsimonious description of the data  
+   
+However, simulations of multiple problem sets suggest that fm="pa" tends to produce slightly
+smaller residuals while having slightly larger RMSEAs than does fm="minres" or fm="mle". That
+is, the sum of squared residuals for fm="pa" seem to be slightly smaller than those found using
+fm="minres" but the RMSEAs are slightly worse when using fm="pa". That is to say, the "true"
+minimal residual is probably found by fm="pa".
+  
+Phi: If oblique rotations (e.g,m using `oblimin` from the GPArotation package or `promax`) are requested, what is the interfactor correlation?
+  
+**r.scores**: = cor(faresults$scores, use = "complete.obs"). The correlations of the factor score estimates using the specified model (in our case the regression model), if they were to be found. Comparing these correlations with that of the scores themselves will show, if an alternative estimate of factor scores is used (e.g., the tenBerge method), the problem of factor indeterminacy. For these correlations will not necessarily be the same.
+
+score.cor: The correlation matrix of course coded (unit weighted) factor score estimates, if
+they were to be found, based upon the loadings matrix rather than the weights matrix.
+
+scores: The factor scores as requested. Note that these scores reflect the choice of the way scores should be estimated (see scores in the input). That is, simple regression ("Thurstone"), correlaton preserving ("tenBerge") as well as "Anderson" and "Bartlett" using the appropriate algorithms (see factor.scores). The correlation between factor score estimates (r.scores) is based upon using the regression/Thurstone approach. The actual correlation between scores will reflect the rotation algorithm chosen and may be found by correlating those scores. Although the scores are found by multiplying the standarized data by the weights matrix, this will not result in standard scores if using regression.
+    
+residual: The matrix of residual correlations after the factor model is applied. To display
+it conveniently, use the residuals command.
+  
+rms: This is the sum of the squared (off diagonal residuals) divided by the degrees
+of freedom. Comparable to an RMSEA which, because it is based upon χ2,requires the number of observations to be specified. The rms is an empirical value while the RMSEA is based upon normal theory and the non-central χ2 distribution. That is to say, if the residuals are particularly non-normal, the rms value and the associated χ2 and RMSEA can differ substantially.
+  
+crms: rms adjusted for degrees of freedom 
+
+RMSEA: The Root Mean Square Error of Approximation is based upon the non-central χ2 distribution and the χ2 estimate found from the MLE fitting function. With normal theory data, this is fine. But when the residuals are not distributed according to a noncentral χ2, this can give very strange values. (And thus the confidence intervals can not be calculated.) The RMSEA is a conventional index of goodness (badness) of fit but it is also useful to examine the actual rms values.
+
+# Resources 
+
+https://stats.idre.ucla.edu/spss/seminars/introduction-to-factor-analysis/a-practical-introduction-to-factor-analysis/ 
+
+https://psych.wisc.edu/moore/Rpdf/R-20ExploratoryFactorAnalysisR.pdf
+
+http://www.statpower.net/Content/312/R%20Stuff/Exploratory%20Factor%20Analysis%20with%20R.pdf
+
+https://www.mailman.columbia.edu/research/population-health-methods/exploratory-factor-analysis
+
+http://www.yorku.ca/ptryfos/f1400.pdf
+
+Luo, L., Arizmendi, C., & Gates, K. M. (2019). Exploratory Factor Analysis (EFA) Programs in R. Structural Equation Modeling: A Multidisciplinary Journal, 1-8. https://doi.org/10.1080/10705511.2019.1615835
+
+https://sakaluk.wordpress.com/2016/05/26/11-make-it-pretty-scree-plots-and-parallel-analysis-using-psych-and-ggplot2/
+
+https://quantdev.ssri.psu.edu/tutorials/intro-basic-exploratory-factor-analysis
+
+https://web.cortland.edu/andersmd/psy341/efa.pdf
+
+http://www.personality-project.org/r/psych/HowTo/factor.pdf
