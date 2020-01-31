@@ -13,7 +13,9 @@ This folder has codes for identifying subjects with (Family History Positive - F
 Details of the instruments are in Barch et al 2018, *Dev Cog Neuroscience*
 
 11,875 subjects
+
 Age in months at the time of the interview (interview_age)
+
 This value has been calculated from the de-identified birth date (middle of the birth month date) and the assent signature time stamp (annual visits) or mypi_date for mid-year visits, and is the same for all sessions of the baseline visit for each participant (even when these fall on different days).   
   
 FHP = at least 1 biological parent with AUD 
