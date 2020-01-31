@@ -5,6 +5,7 @@ This folder has codes for identifying subjects with (Family History Positive - F
 3. Then, exclude subjects with any substance use  `substance.Rmd`
 3. Lastly, exclude those with major disorders (schizophrenia, bipolar) `MentalHealth.Rmd`
 4. Merge all demographic information, match FHN with FHP `demographs.Rmd`, get the final list of FHN and FHP
+5. Run a group analysis on baseline neuropsychological measures `neuropsych.Rmd` and `EFA.Rmd`
 
 
 # Family History
