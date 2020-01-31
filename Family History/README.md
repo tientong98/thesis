@@ -1,7 +1,7 @@
 This folder has codes for identifying subjects with (Family History Positive - FHP) and without (Family History Negative - FHN) a family history of Alcohol Use Disorder. 
 
 1. First, identify FHP and FHN `FamHisAlc.Rmd` 
-2. Then, exclude the identified subjects and drug exposure in utero `PhysicalHealth.Rmd`
+2. Then, exclude the identified subjects with TBI and significant drug exposure in utero `PhysicalHealth.Rmd`
 3. Then, exclude subjects with any substance use  `substance.Rmd`
 3. Lastly, exclude those with major disorders (schizophrenia, bipolar) `MentalHealth.Rmd`
 4. Merge all demographic information, match FHN with FHP `demographs.Rmd`, get the final list of FHN and FHP
