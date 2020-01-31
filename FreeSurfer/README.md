@@ -25,11 +25,7 @@ sh /Shared/tientong_scratch/abcd/code/freesurfer00createAtroposN4_T2.sh -r /Shar
 ls * | xargs -i{} -P10 sh {}
 ```
 
-
-```python
 ## Run Freesurfer for subjects with both T1 and T2
-```
-
 
 ```bash
 cd /Shared/tientong_scratch/abcd/code/freesurfer01createFSjobsT1T2 # all the sh scripts will be here
