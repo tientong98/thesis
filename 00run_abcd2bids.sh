@@ -18,7 +18,7 @@ export PATH=$PATH:/Shared/pinc/sharedopt/apps/dcm2niix/Linux/x86_64/1.0.20180622
 export PATH=$PATH:/Shared/tientong_scratch/test500/abcd2bids/pigz-2.4
 export PATH=$PATH:~/bin
 
-python /Shared/tientong_scratch/test500/abcd2bids_convert/abcd2bids_github/abcd2bids.py /Shared/pinc/sharedopt/apps/fsl/Linux/x86_64/5.0.8 /Shared/tientong_scratch/test500/abcd2bids_convert/R2016b/v91 --username tientong --password Ru12Ka11Wa14! 2>&1 | tee ${log}
+python /Shared/tientong_scratch/test500/abcd2bids_convert/abcd2bids_github/abcd2bids.py /Shared/pinc/sharedopt/apps/fsl/Linux/x86_64/5.0.8 /Shared/tientong_scratch/test500/abcd2bids_convert/R2016b/v91 --username tientong --password <your password> 2>&1 | tee ${log}
 
 date +"end_time: %Y-%m-%d_%H-%M-%S" >> ${log}
 echo '' >> ${log}
