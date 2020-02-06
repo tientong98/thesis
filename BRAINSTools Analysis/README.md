@@ -6,7 +6,7 @@ The scipts are modified from the pipeline developed by the researchers at the [I
 
 1. Run the csv creator
 
-`baw01BRAINSTools_csvcreator.sh`
+[`baw01BRAINSTools_csvcreator.sh`](https://github.com/tientong98/thesis/blob/master/BRAINSTools%20Analysis/baw01BRAINSTools_csvcreator.sh)
 
 Note: BrainsTools expects all session to be different - have to replace session (baselineYear1Arm1) with a series of random numbers/strings 
 
@@ -21,7 +21,7 @@ done
 
 2. Make changes to the config file (on the lines written in the header
 
-`baw02BRAINSTools.config`
+[`baw02BRAINSTools.config`](https://github.com/tientong98/thesis/blob/master/BRAINSTools%20Analysis/baw02BRAINSTools.config)
 
 3. Run BrainsTools on argon with
 
