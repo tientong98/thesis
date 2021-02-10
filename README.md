@@ -6,7 +6,7 @@ This Github repo consists of codes used in my thesis project: Testing difference
 * [Step 4: Run BRAINSTools](https://github.com/tientong98/thesis/tree/master/BRAINSTools%20Analysis)
 * [Step 5: Run Freesurfer](https://github.com/tientong98/thesis/tree/master/FreeSurfer)
   * QC with [Quoala-T](https://github.com/Qoala-T)
-* Step 6: Run fMRIPrep and Resting State analysis
+* [Step 6: Run fMRIPrep and Resting State analysis](https://github.com/tientong98/thesis/tree/master/Resting%20State)
 
 # [Download data and organize in BIDS format](https://github.com/tientong98/thesis/blob/master/run_abcd2bids.sh)
 
