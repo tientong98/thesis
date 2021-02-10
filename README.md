@@ -17,7 +17,12 @@ To run their scripts on our machines, make sure you follow what is listed in the
 
 Also, because I only care about rs fMRI and sMRI, I went through all of the scripts and config files in my local abcd-dicom2bids repo and delete everything related to task fMRI or validating BIDS (running BIDS validation needs docker, which can't be run on IFT machines). Below is an example of how to run this script
 
-`python <path to script>/abcd2bids.py /Shared/pinc/sharedopt/apps/fsl/Linux/x86_64/5.0.8 /Shared/tientong_scratch/abcd/code/00abcd2bids_convert/R2016b/v91 --username tientong --password <your password> 2>&1 | tee abcd2bids_log.txt `
+```
+python <path to script>/abcd2bids.py \
+ /Shared/pinc/sharedopt/apps/fsl/Linux/x86_64/5.0.8 \
+ /Shared/tientong_scratch/abcd/code/00abcd2bids_convert/R2016b/v91 \
+ --username tientong --password <your password> 2>&1 | tee abcd2bids_log.txt 
+```
 
 What I would recommend is submitting this as job on Argon
 
