@@ -4,7 +4,7 @@ The scipts are modified from the pipeline developed by the researchers at the [I
 
 # Running BrainsTools
 
-0. Create random hash
+# 0. Create random hash
 
 Note: BrainsTools expects all session to be different - have to replace session (baselineYear1Arm1) with a series of random numbers/strings 
 
@@ -24,7 +24,7 @@ done
 ls -d $bids/*/*/ > /Shared/tientong_scratch/abcd/derivatives/baw/randomhash_200725.txt
 ```
 
-1. Run the csv creator
+# 1. Run the csv creator
 
 [`BRAINSTools_csvcreator.sh`](https://github.com/tientong98/thesis/blob/master/BRAINSTools%20Analysis/BRAINSTools_csvcreator.sh)
 
@@ -36,16 +36,13 @@ sh /Shared/tientong_scratch/abcd/code/brainstools/BRAINSTools_csvcreator.sh \
  -o /Shared/tientong_scratch/abcd/derivatives/baw/200725.csv
 ```
 
-2. Make changes to the config file (on the lines written in the header
+# 2. Make changes to the config file (on the lines written in the header
 
 [`BRAINSTools.config`](https://github.com/tientong98/thesis/blob/master/BRAINSTools%20Analysis/BRAINSTools.config)
 
-3. Run BrainsTools on argon with
+# 3. Run BrainsTools on argon with
 
 `baw03runbaw.sh`
-
-The steps are pasted below:
-
 
 ```bash
 # run this on argon
