@@ -1,8 +1,8 @@
 This Github repo consists of codes used in my thesis project: Testing differences in brain structure and functional connectivity between children with and without a family history of Alcohol Use Disorder, data from the Adolescents Brain Cognitive Development (ABCD) study.
 
 * [Step 1: Identify subjects with and without a family history of Alcohol Use Disorder](https://github.com/tientong98/thesis/tree/master/Family%20History)
-* Step 2: Download the data and organize in BIDS format (details below in this README file)
-* Step 3: Run MRIQC (details below in this README file)
+* [Step 2: Download the data and organize in BIDS format](https://github.com/tientong98/thesis#download-data-and-organize-in-bids-format)
+* [Step 3: Run MRIQC](https://github.com/tientong98/thesis#run-mriqc)
 * [Step 4: Run BRAINSTools](https://github.com/tientong98/thesis/tree/master/BRAINSTools%20Analysis)
 * [Step 5: Run Freesurfer](https://github.com/tientong98/thesis/tree/master/FreeSurfer)
   * QC with [Quoala-T](https://github.com/Qoala-T)
