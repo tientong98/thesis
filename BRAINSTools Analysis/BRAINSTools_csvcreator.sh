@@ -1,3 +1,4 @@
+
 #! /bin/bash
 function Usage {
     cat <<USAGE
@@ -44,13 +45,16 @@ in
 esac
 done
 
-for i in ${researcherRoot}/${projectName}/rawdata/[a-zA-Z0-9]*/[a-zA-Z0-9]*/anat ; do 
-T1=`find $i -name \*T1w.nii.gz`
-T2=`find $i -name \*T2w.nii.gz`
-info=(`echo $i | awk '{gsub("/"," "); print $0}'`)
-if [ "$T2" == "" ] ; then
-printf \"${projectName}\",\"${info[4]}\",\"${info[5]}\",\"\{\'T1-30\'\:\[\'$T1\'\]\}\"'\n'
-else
-   printf \"${projectName}\",\"${info[4]}\",\"${info[5]}\",\"\{\'T1-30\'\:\[\'$T1\'\]\,\'T2-30\'\:\[\'$T2\'\]\}\"'\n'
-fi
+bids=${researcherRoot}/${projectName}/rawdata
+T1=($(find $bids/*/*/ -name \*T1w.nii.gz))
+
+for i in ${!T1[@]} ; do
+ SUBJECT=`cut -d "/" -f6 <<< ${T1[$i]}`
+ SESSION=`cut -d "/" -f7 <<< ${T1[$i]}`
+ if [ 0 -lt `ls ${bids}/${SUBJECT}/${SESSION}/anat/*T2w.nii.gz 2>/dev/null | wc -c` ] ; then
+   T2=`ls ${bids}/${SUBJECT}/${SESSION}/anat/*T2w.nii.gz`
+   printf \"${projectName}\",\"${SUBJECT}\",\"${SESSION}\",\"\{\'T1-30\'\:\[\'${T1[$i]}\'\]\,\'T2-30\'\:\[\'$T2\'\]\}\"'\n'
+ else
+   printf \"${projectName}\",\"${SUBJECT}\",\"${SESSION}\",\"\{\'T1-30\'\:\[\'${T1[$i]}\'\]\}\"'\n'
+ fi
 done > ${outputFile}
