@@ -47,9 +47,12 @@ Right now not sure what happened with the abcd2bids script, move all of those fi
 
 ```bash
 for i in /Shared/tientong_scratch/abcd/rawdata/[a-zA-Z0-9]*/[a-zA-Z0-9]*/fmap ; do 
-sub=(`echo $i | awk '{gsub("/"," "); print $5}' | awk '{gsub("-"," "); print $2}'`)
-ses=(`echo $i | awk '{gsub("/"," "); print $6}' | awk '{gsub("-"," "); print $2}'`)
-[ -f /Shared/tientong_scratch/abcd/rawdata/sub-${sub}/ses-${ses}/fmap/vol*2*.nii.gz ] && mkdir -p /Shared/tientong_scratch/abcd/nojson/sub-${sub}/ses-${ses}/fmap && mv /Shared/tientong_scratch/abcd/rawdata/sub-${sub}/ses-${ses}/fmap/vol*.nii.gz /Shared/tientong_scratch/abcd/nojson/sub-${sub}/ses-${ses}/fmap
+  sub=(`echo $i | awk '{gsub("/"," "); print $5}' | awk '{gsub("-"," "); print $2}'`)
+  ses=(`echo $i | awk '{gsub("/"," "); print $6}' | awk '{gsub("-"," "); print $2}'`)
+  [ -f /Shared/tientong_scratch/abcd/rawdata/sub-${sub}/ses-${ses}/fmap/vol*2*.nii.gz ] && \
+  mkdir -p /Shared/tientong_scratch/abcd/nojson/sub-${sub}/ses-${ses}/fmap && \
+  mv /Shared/tientong_scratch/abcd/rawdata/sub-${sub}/ses-${ses}/fmap/vol*.nii.gz \
+  /Shared/tientong_scratch/abcd/nojson/sub-${sub}/ses-${ses}/fmap
 done
 ```
 
@@ -88,29 +91,30 @@ Content of the template file pasted below
 #$ -e /Users/tientong/logs/abcd/mriqc/err
 OMP_NUM_THREADS=8
 singularity run -H /Users/tientong/singularity_home \
-/Users/tientong/mriqc_0.14.2.sif \
-/Shared/tientong_scratch/abcd/rawdata \
-/Shared/tientong_scratch/abcd/derivatives/mriqc \
-participant --participant_label SUBJECT \
---no-sub --verbose-reports --write-graph \
--w /Shared/tientong_scratch/abcd/derivatives/mriqc \
---n_procs 8 --mem_gb 36000
+  /Users/tientong/mriqc_0.14.2.sif \
+     /Shared/tientong_scratch/abcd/rawdata \
+     /Shared/tientong_scratch/abcd/derivatives/mriqc \
+     participant --participant_label SUBJECT \
+     --no-sub --verbose-reports --write-graph \
+     -w /Shared/tientong_scratch/abcd/derivatives/mriqc \
+     --n_procs 8 --mem_gb 36000
 ```
 **Create a list of available subjects**
 
 ```bash
 outputFile=/Shared/tientong_scratch/abcd/log/subjectlist/200129list.txt
 for i in /Shared/tientong_scratch/abcd/rawdata/[a-zA-Z0-9]*/[a-zA-Z0-9]*/anat ; do 
-info=(`echo $i | awk '{gsub("/"," "); print $5}'`)
-sub=(`echo $info | awk '{gsub("-"," "); print $2}'`)
-echo $sub
+  info=(`echo $i | awk '{gsub("/"," "); print $5}'`)
+  sub=(`echo $info | awk '{gsub("-"," "); print $2}'`)
+  echo $sub
 done > ${outputFile}
 ```
 **Then run this on argon to create individual subjects mriqc job script, then submit the jobs**
 
 ```bash
 for sub in $(cat /Shared/tientong_scratch/abcd/log/subjectlist/200129list.txt | tr '\n' ' ') ; do
-sed -e "s|SUBJECT|${sub}|" /Users/tientong/job_scripts/mriqc/abcd/mriqc_TEMPLATE.job > /Users/tientong/job_scripts/mriqc/abcd/mriqc_sub-${sub}.job
+    sed -e "s|SUBJECT|${sub}|" /Users/tientong/job_scripts/mriqc/abcd/mriqc_TEMPLATE.job > \
+    /Users/tientong/job_scripts/mriqc/abcd/mriqc_sub-${sub}.job
 done
 
 for sub in $(cat /Shared/tientong_scratch/abcd/log/subjectlist/200129list.txt | tr '\n' ' ') ; do
@@ -140,12 +144,13 @@ Detailed logs are at `/Shared/tientong_scratch/abcd/derivatives/mriqc/logs`
 ```bash
 # after finish subject level analysis, run the group analysis (concatnate subjects' files)
 
-singularity run -H /Users/tientong/singularity_home \
-/Users/tientong/mriqc_0.14.2.sif \
-/Shared/tientong_scratch/abcd/rawdata \
-/Shared/tientong_scratch/abcd/derivatives/mriqc \
-group --no-sub --verbose-reports --write-graph \
--w /Shared/tientong_scratch/abcd/derivatives/mriqc
+singularity run \
+   -H /Users/tientong/singularity_home \
+   /Users/tientong/mriqc_0.14.2.sif \
+      /Shared/tientong_scratch/abcd/rawdata \
+      /Shared/tientong_scratch/abcd/derivatives/mriqc \
+      group --no-sub --verbose-reports --write-graph \
+      -w /Shared/tientong_scratch/abcd/derivatives/mriqc
 ```
 
 Once the group level MRIQC is completed, move all files to
